@@ -1,12 +1,8 @@
 name: Build & deploy Next.js app to Azure Web App
 
-# When this action will be executed
 on:
-  # Automatically trigger it when detected changes in repo
   push:
     branches: [main]
-
-  # Allow manual workflow trigger
   workflow_dispatch:
 
 jobs:
@@ -28,7 +24,7 @@ jobs:
           npm install
           npm run build --if-present
           cd ..
-
+          
       - name: 📂 Copy standalone into the root
         run: cp -R ./src/.next/standalone ./site-deploy
 
@@ -77,16 +73,24 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Set the build during deployment setting to false. This setting was added in the templates to all azd to work, but breaks deployment via webapps-deploy
-      - name: Azure CLI script
+      - name: Azure CLI script – Configure App Service settings
         uses: azure/CLI@v2.1.0
         with:
           inlineScript: |
+            # Retrieve the resource group for the target app
             rg=$(az webapp list --query "[?name=='${{ secrets.AZURE_APP_SERVICE_NAME }}'].resourceGroup" --output tsv)
-            echo Setting SCM_DO_BUILD_DURING_DEPLOYMENT=false on app service ${{ secrets.AZURE_APP_SERVICE_NAME }}
+            echo "Setting SCM_DO_BUILD_DURING_DEPLOYMENT=false on app service ${{ secrets.AZURE_APP_SERVICE_NAME }}"
             az webapp config appsettings set -n ${{ secrets.AZURE_APP_SERVICE_NAME }} -g $rg --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false -o none
-            echo Setting --startup-file=\"node server.js\" on app service ${{ secrets.AZURE_APP_SERVICE_NAME }}
+
+            echo "Setting WEBSITE_RUN_FROM_PACKAGE=1 on app service ${{ secrets.AZURE_APP_SERVICE_NAME }}"
+            az webapp config appsettings set -n ${{ secrets.AZURE_APP_SERVICE_NAME }} -g $rg --settings WEBSITE_RUN_FROM_PACKAGE=1 -o none
+
+            echo "Disabling same restrictions for SCM on app service ${{ secrets.AZURE_APP_SERVICE_NAME }}"
+            az webapp config access-restriction set -n ${{ secrets.AZURE_APP_SERVICE_NAME }} -g $rg --use-same-restrictions-for-scm-site false -o none
+
+            echo "Setting startup file on app service ${{ secrets.AZURE_APP_SERVICE_NAME }}"
             az webapp config set --startup-file="node server.js" -n ${{ secrets.AZURE_APP_SERVICE_NAME }} -g $rg -o none
+
             sleep 10
 
       - name: 🚀 Deploy to Azure Web App
