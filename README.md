@@ -1,3 +1,12 @@
+# Suggest services for hobbyist
+
+- Azure App Service Basic
+- Azure OpenAI Standard
+- Form Recognizer
+- Azure Cosmos DB
+- Azure Monitor
+- Azure Cognitive Search - Free Tier
+
 # What's new - January 2025
 
 A new year brings some much requested feature updates to one of our most popular AI chat repos!
