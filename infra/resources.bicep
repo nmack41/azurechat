@@ -13,12 +13,6 @@ param embeddingDeploymentName string
 param embeddingDeploymentCapacity int
 param embeddingModelName string 
 
-param dalleLocation string
-param dalleDeploymentCapacity int
-param dalleDeploymentName string
-param dalleModelName string
-param dalleApiVersion string
-
 param speechServiceSkuName string = 'S0'
 
 param formRecognizerSkuName string = 'S0'
@@ -39,7 +33,6 @@ param nextAuthHash string = uniqueString(newGuid())
 param tags object = {}
 
 var openai_name = toLower('${name}-aillm-${resourceToken}')
-var openai_dalle_name = toLower('${name}-aidalle-${resourceToken}')
 
 var form_recognizer_name = toLower('${name}-form-${resourceToken}')
 var speech_service_name = toLower('${name}-speech-${resourceToken}')
@@ -137,18 +130,6 @@ var appSettingsCommon = [
       value: openai_api_version
     }
     {
-      name: 'AZURE_OPENAI_DALLE_API_INSTANCE_NAME'
-      value: openai_dalle_name
-    }
-    {
-      name: 'AZURE_OPENAI_DALLE_API_DEPLOYMENT_NAME'
-      value: dalleDeploymentName
-    }
-    {
-      name: 'AZURE_OPENAI_DALLE_API_VERSION'
-      value: dalleApiVersion
-    }
-    {
       name: 'NEXTAUTH_SECRET'
       value: '@Microsoft.KeyVault(VaultName=${kv.name};SecretName=${kv::NEXTAUTH_SECRET.name})'
     }
@@ -190,10 +171,6 @@ var appSettingsWithLocalAuth = disableLocalAuth ? [] : [
   {
     name: 'AZURE_OPENAI_API_KEY'
     value:  '@Microsoft.KeyVault(VaultName=${kv.name};SecretName=${kv::AZURE_OPENAI_API_KEY.name})'
-  }
-  {
-    name: 'AZURE_OPENAI_DALLE_API_KEY'
-    value: '@Microsoft.KeyVault(VaultName=${kv.name};SecretName=${kv::AZURE_OPENAI_DALLE_API_KEY.name})'
   }
   {
     name: 'AZURE_COSMOSDB_KEY'
@@ -292,14 +269,6 @@ resource kv 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
     properties: {
       contentType: 'text/plain'
       value: azureopenai.listKeys().key1
-    }
-  }
-
-  resource AZURE_OPENAI_DALLE_API_KEY 'secrets' = if (!disableLocalAuth){
-    name: 'AZURE-OPENAI-DALLE-API-KEY'
-    properties: {
-      contentType: 'text/plain'
-      value: azureopenaidalle.listKeys().key1
     }
   }
 
@@ -476,37 +445,6 @@ resource llmdeployment 'Microsoft.CognitiveServices/accounts/deployments@2023-05
   }
 }]
 
-resource azureopenaidalle 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
-  name: openai_dalle_name
-  location: dalleLocation
-  tags: tags
-  kind: 'OpenAI'
-  properties: {
-    customSubDomainName: openai_dalle_name
-    publicNetworkAccess: 'Enabled'
-    disableLocalAuth: disableLocalAuth
-  }
-  sku: {
-    name: openAiSkuName
-  }
-
-  resource dalleDeployment 'deployments' = {
-    name: dalleDeploymentName
-    properties: {
-      model: {
-        format: 'OpenAI'
-        name: dalleModelName
-      }
-    }
-    sku: {
-      name: 'Standard'
-      capacity: dalleDeploymentCapacity
-    }
-  }
-}
-
-
-
 resource speechService 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
   name: speech_service_name
   location: location
@@ -674,7 +612,6 @@ resource assignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@20
 output url string = 'https://${webApp.properties.defaultHostName}'
 output webapp_name string = webapp_name
 output openai_name string = openai_name
-output openai_dalle_name string = openai_dalle_name
 output cosmos_name string = cosmos_name
 output cosmos_endpoint string = cosmosDbAccount.properties.documentEndpoint
 output database_name string = databaseName

@@ -80,11 +80,6 @@ module resources 'resources.bicep' = {
     embeddingDeploymentName: embeddingDeploymentName
     embeddingDeploymentCapacity: embeddingDeploymentCapacity
     embeddingModelName: embeddingModelName
-    //dalleLocation: deLocation
-    //dalleDeploymentCapacity: dalleDeploymentCapacity
-    //dalleDeploymentName: dalleDeploymentName
-    //dalleModelName: dalleModelName
-    //dalleApiVersion: dalleApiVersion
     formRecognizerSkuName: formRecognizerSkuName
     searchServiceIndexName: searchServiceIndexName
     searchServiceSkuName: searchServiceSkuName
