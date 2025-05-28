@@ -45,12 +45,17 @@ const configureIdentityProvider = () => {
         tenantId: process.env.AZURE_AD_TENANT_ID!,
         authorization: {
           params: {
-            scope: "openid profile User.Read", 
+            scope: "openid profile User.Read",
+            prompt: "login",
+            domain_hint: "cre-chat.com",
           },
         },
         async profile(profile, tokens) {
           const email = profile.email || profile.preferred_username || "";
-          const image = await fetchProfilePicture(`https://graph.microsoft.com/v1.0/me/photos/48x48/$value`, tokens.access_token);
+          const image = await fetchProfilePicture(
+            `https://graph.microsoft.com/v1.0/me/photos/48x48/$value`,
+            tokens.access_token
+          );
           const newProfile = {
             ...profile,
             email,
@@ -94,8 +99,7 @@ const configureIdentityProvider = () => {
           };
           console.log(
             "=== DEV USER LOGGED IN:\n",
-            JSON.stringify(user, null, 2,
-            )
+            JSON.stringify(user, null, 2)
           );
           return user;
         },
@@ -106,9 +110,12 @@ const configureIdentityProvider = () => {
   return providers;
 };
 
-export const fetchProfilePicture = async (profilePictureUrl: string, accessToken: any): Promise<any> => {
+export const fetchProfilePicture = async (
+  profilePictureUrl: string,
+  accessToken: any
+): Promise<any> => {
   console.log("Fetching profile picture...");
-  var image = null
+  var image = null;
   const profilePicture = await fetch(
     profilePictureUrl,
     accessToken && {
@@ -122,13 +129,15 @@ export const fetchProfilePicture = async (profilePictureUrl: string, accessToken
     const pictureBuffer = await profilePicture.arrayBuffer();
     const pictureBase64 = Buffer.from(pictureBuffer).toString("base64");
     image = `data:image/jpeg;base64,${pictureBase64}`;
-  }
-  else {
-    console.error("Failed to fetch profile picture:", profilePictureUrl, profilePicture.statusText);
+  } else {
+    console.error(
+      "Failed to fetch profile picture:",
+      profilePictureUrl,
+      profilePicture.statusText
+    );
   }
   return image;
 };
-
 
 export const options: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
