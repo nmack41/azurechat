@@ -27,13 +27,13 @@ export const LogIn: FC<LoginProps> = (props) => {
           </Avatar>
           <span className="text-primary">{AI_NAME}</span>
         </CardTitle>
-        <CardDescription>
-          Login in with your Microsoft 365 account
-        </CardDescription>
+        <CardDescription>Sign in with Azure Active Directory</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">
         {props.entraIdEnabled && (
-          <Button onClick={() => signIn("azure-ad")}>Microsoft 365</Button>
+          <Button onClick={() => signIn("azure-ad")}>
+            Sign in with Azure Active Directory
+          </Button>
         )}
         {props.isDevMode && (
           <Button onClick={() => signIn("localdev")}>
