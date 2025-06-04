@@ -1,6 +1,7 @@
 import { AI_NAME } from "@/features/theme/theme-config";
 import { ThemeProvider } from "@/features/theme/theme-provider";
 import { Toaster } from "@/features/ui/toaster";
+import { AppErrorBoundary } from "@/features/ui/error-boundary";
 import { cn } from "@/ui/lib";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -30,8 +31,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          <Toaster />
+          <AppErrorBoundary>
+            {children}
+            <Toaster />
+          </AppErrorBoundary>
         </ThemeProvider>
       </body>
     </html>

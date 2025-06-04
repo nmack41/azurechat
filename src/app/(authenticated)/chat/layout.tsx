@@ -6,6 +6,7 @@ import { cn } from "@/ui/lib";
 
 import { AI_NAME } from "@/features/theme/theme-config";
 import { DisplayError } from "@/features/ui/error/display-error";
+import { ChatErrorBoundary } from "@/features/ui/error-boundary";
 import { ScrollArea } from "@/features/ui/scroll-area";
 
 export const dynamic = "force-dynamic";
@@ -35,7 +36,9 @@ export default async function RootLayout({
             <ChatMenu menuItems={chatHistoryResponse.response} />
           </ScrollArea>
         </MenuTray>
-        {children}
+        <ChatErrorBoundary>
+          {children}
+        </ChatErrorBoundary>
       </div>
     </div>
   );
