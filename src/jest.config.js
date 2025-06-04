@@ -13,6 +13,9 @@ const customJestConfig = {
     // Handle module aliases (same as in tsconfig.json)  
     '^@/(.*)$': '<rootDir>/$1',
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!((@azure|openai)/.*))',
+  ],
   collectCoverageFrom: [
     'features/common/services/**/*.{js,jsx,ts,tsx}',
     '!**/*.d.ts',

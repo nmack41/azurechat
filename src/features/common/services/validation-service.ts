@@ -50,8 +50,8 @@ async function validateFileSignature(buffer: ArrayBuffer, declaredMimeType: stri
   const signature = FILE_SIGNATURES[declaredMimeType as keyof typeof FILE_SIGNATURES];
   
   if (!signature) {
-    // No signature check for this type, allow text files
-    return declaredMimeType.startsWith('text/');
+    // No signature check for this type, allow text files and SVG
+    return declaredMimeType.startsWith('text/') || declaredMimeType === 'image/svg+xml';
   }
   
   // Check if file starts with expected signature

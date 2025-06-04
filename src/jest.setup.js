@@ -48,6 +48,32 @@ jest.mock('@azure/cosmos', () => ({
   })),
 }))
 
+jest.mock('@azure/identity', () => ({
+  DefaultAzureCredential: jest.fn(),
+  getBearerTokenProvider: jest.fn(() => jest.fn()),
+}))
+
+jest.mock('@azure/search-documents', () => ({
+  AzureKeyCredential: jest.fn(),
+  SearchClient: jest.fn(),
+  SearchIndexClient: jest.fn(),  
+  SearchIndexerClient: jest.fn(),
+}))
+
+jest.mock('@azure/ai-form-recognizer', () => ({
+  AzureKeyCredential: jest.fn(),
+  DocumentAnalysisClient: jest.fn(),
+}))
+
+jest.mock('@azure/keyvault-secrets', () => ({
+  SecretClient: jest.fn(),
+}))
+
+jest.mock('openai', () => ({
+  OpenAI: jest.fn(),
+  AzureOpenAI: jest.fn(),
+}))
+
 jest.mock('@azure/openai', () => ({
   OpenAIClient: jest.fn(() => ({
     getChatCompletions: jest.fn(() => Promise.resolve({
@@ -130,6 +156,11 @@ global.FormData = jest.fn(() => ({
   get: jest.fn(),
   set: jest.fn(),
 }))
+
+// Add TextEncoder/TextDecoder for Node.js environment
+const { TextEncoder, TextDecoder } = require('util')
+global.TextEncoder = TextEncoder
+global.TextDecoder = TextDecoder
 
 // Suppress console warnings in tests unless explicitly testing them
 const originalConsoleWarn = console.warn

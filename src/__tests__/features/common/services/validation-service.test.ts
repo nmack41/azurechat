@@ -168,16 +168,50 @@ describe('Validation Service', () => {
       return file
     }
 
-    it('should accept valid PDF files', async () => {
-      const pdfFile = createMockFile('test.pdf', 'application/pdf', 1024)
+    const createMockFileWithContent = (name: string, type: string, size: number, content: Uint8Array): File => {
+      // Create a proper mock file with specific binary content
+      const mockFile = {
+        name,
+        type,
+        size,
+        arrayBuffer: jest.fn().mockResolvedValue(content.buffer),
+        text: jest.fn().mockResolvedValue(''),
+      } as unknown as File
+      
+      return mockFile
+    }
+
+    it('should accept valid PDF files with correct signature', async () => {
+      // PDF signature: %PDF
+      const pdfContent = new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x34])
+      const pdfFile = createMockFileWithContent('test.pdf', 'application/pdf', 1024, pdfContent)
       const allowedTypes = {
         'application/pdf': { ext: ['.pdf'], maxSize: 10 * 1024 * 1024 },
       }
       
       const result = await validateFile(pdfFile, allowedTypes)
       
-      expect(result.status).toBe('ERROR')
-      expect(result.errors).toBeDefined()
+      expect(result.status).toBe('OK')
+      expect(result.response!.isValid).toBe(true)
+    })
+
+    it('should accept text files without signature check', async () => {
+      const mockTextFile = {
+        name: 'test.txt',
+        type: 'text/plain',
+        size: 1024,
+        arrayBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(1024)),
+        text: jest.fn().mockResolvedValue('Hello world'),
+      } as unknown as File
+      
+      const allowedTypes = {
+        'text/plain': { ext: ['.txt'], maxSize: 5 * 1024 * 1024 },
+      }
+      
+      const result = await validateFile(mockTextFile, allowedTypes)
+      
+      expect(result.status).toBe('OK')
+      expect(result.response!.isValid).toBe(true)
     })
 
     it('should reject files with wrong extension', async () => {
@@ -214,6 +248,104 @@ describe('Validation Service', () => {
       
       expect(result.status).toBe('ERROR')
       expect(result.errors![0].message).toContain("File type 'application/javascript' is not allowed")
+    })
+
+    it('should reject empty files', async () => {
+      const emptyFile = createMockFile('empty.pdf', 'application/pdf', 0)
+      const allowedTypes = {
+        'application/pdf': { ext: ['.pdf'], maxSize: 10 * 1024 * 1024 },
+      }
+      
+      const result = await validateFile(emptyFile, allowedTypes)
+      
+      expect(result.status).toBe('ERROR')
+      expect(result.errors![0].message).toContain('File is empty')
+    })
+
+    it('should reject files with wrong signature', async () => {
+      // Wrong signature for PDF (should start with %PDF)
+      const wrongContent = new Uint8Array([0x89, 0x50, 0x4E, 0x47]) // PNG signature
+      const fakeFile = createMockFileWithContent('fake.pdf', 'application/pdf', 1024, wrongContent)
+      const allowedTypes = {
+        'application/pdf': { ext: ['.pdf'], maxSize: 10 * 1024 * 1024 },
+      }
+      
+      const result = await validateFile(fakeFile, allowedTypes)
+      
+      expect(result.status).toBe('ERROR')
+      expect(result.errors![0].message).toContain('File content does not match declared file type')
+    })
+
+    it('should validate SVG files and reject dangerous content', async () => {
+      const dangerousSvg = '<svg><script>alert("xss")</script></svg>'
+      const svgBytes = new TextEncoder().encode(dangerousSvg)
+      const mockSvgFile = {
+        name: 'test.svg',
+        type: 'image/svg+xml',
+        size: svgBytes.length,
+        arrayBuffer: jest.fn().mockResolvedValue(svgBytes.buffer),
+        text: jest.fn().mockResolvedValue(dangerousSvg),
+      } as unknown as File
+      
+      const allowedTypes = {
+        'image/svg+xml': { ext: ['.svg'], maxSize: 2 * 1024 * 1024 },
+      }
+      
+      const result = await validateFile(mockSvgFile, allowedTypes)
+      
+      expect(result.status).toBe('ERROR')
+      expect(result.errors![0].message).toContain('SVG file contains potentially dangerous content')
+    })
+
+    it('should accept safe SVG files', async () => {
+      const safeSvg = '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="blue"/></svg>'
+      const svgBytes = new TextEncoder().encode(safeSvg)
+      const mockSvgFile = {
+        name: 'test.svg',
+        type: 'image/svg+xml', 
+        size: svgBytes.length,
+        arrayBuffer: jest.fn().mockResolvedValue(svgBytes.buffer),
+        text: jest.fn().mockResolvedValue(safeSvg),
+      } as unknown as File
+      
+      const allowedTypes = {
+        'image/svg+xml': { ext: ['.svg'], maxSize: 2 * 1024 * 1024 },
+      }
+      
+      const result = await validateFile(mockSvgFile, allowedTypes)
+      
+      expect(result.status).toBe('OK')
+      expect(result.response!.isValid).toBe(true)
+    })
+
+    it('should handle file validation errors gracefully', async () => {
+      const errorFile = {
+        name: 'error.pdf',
+        type: 'application/pdf',
+        size: 1024,
+        arrayBuffer: jest.fn().mockRejectedValue(new Error('File read error')),
+      } as unknown as File
+      
+      const allowedTypes = {
+        'application/pdf': { ext: ['.pdf'], maxSize: 10 * 1024 * 1024 },
+      }
+      
+      const result = await validateFile(errorFile, allowedTypes)
+      
+      expect(result.status).toBe('ERROR')
+      expect(result.errors![0].message).toContain('File validation error')
+    })
+
+    it('should handle files without extensions', async () => {
+      const noExtFile = createMockFile('README', 'text/plain', 1024)
+      const allowedTypes = {
+        'text/plain': { ext: ['.txt'], maxSize: 5 * 1024 * 1024 },
+      }
+      
+      const result = await validateFile(noExtFile, allowedTypes)
+      
+      expect(result.status).toBe('ERROR')
+      expect(result.errors![0].message).toContain("File extension '' does not match MIME type")
     })
   })
 
