@@ -188,7 +188,13 @@ export function sanitizeInput(input: string, options?: {
 }): string {
   const { maxLength = 10000, allowNewlines = true, allowBasicFormatting = false } = options || {};
   
-  let sanitized = input;
+  // Handle null/undefined inputs
+  if (input === null || input === undefined) {
+    return '';
+  }
+  
+  // Ensure input is a string
+  let sanitized = String(input);
   
   // Remove null bytes
   sanitized = sanitized.replace(/\0/g, '');
