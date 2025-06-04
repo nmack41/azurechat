@@ -6,6 +6,7 @@ import {
   SpeechConfig,
   SpeechSynthesizer,
 } from "microsoft-cognitiveservices-speech-sdk";
+import { useEffect } from "react";
 import { proxy, useSnapshot } from "valtio";
 import { GetSpeechToken } from "./speech-service";
 import { speechToTextStore } from "./use-speech-to-text";
@@ -22,9 +23,24 @@ class TextToSpeech {
     }
   }
 
+  public dispose() {
+    // Cleanup method to prevent memory leaks
+    this.stopPlaying();
+    if (player) {
+      player.close();
+      player = undefined;
+    }
+  }
+
   public async textToSpeech(textToSpeak: string) {
     if (this.isPlaying) {
       this.stopPlaying();
+    }
+
+    // Dispose of previous player to prevent memory leaks
+    if (player) {
+      player.close();
+      player = undefined;
     }
 
     const tokenObj = await GetSpeechToken();
@@ -77,5 +93,14 @@ class TextToSpeech {
 export const textToSpeechStore = proxy(new TextToSpeech());
 
 export const useTextToSpeech = () => {
-  return useSnapshot(textToSpeechStore);
+  const snapshot = useSnapshot(textToSpeechStore);
+  
+  useEffect(() => {
+    // Cleanup on unmount to prevent memory leaks
+    return () => {
+      textToSpeechStore.dispose();
+    };
+  }, []);
+  
+  return snapshot;
 };

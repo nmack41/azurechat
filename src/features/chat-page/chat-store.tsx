@@ -131,9 +131,10 @@ class ChatState {
 
   private async chat(formData: FormData) {
     this.updateAutoScroll(true);
-    this.loading = "loading";
+    // Loading state is set by caller to prevent race conditions
 
-    const multimodalImage = formData.get("image-base64") as unknown as string;
+    const multimodalImageRaw = formData.get("image-base64");
+    const multimodalImage = typeof multimodalImageRaw === "string" ? multimodalImageRaw : "";
 
     const newUserMessage: ChatMessageModel = {
       id: uniqueId(),
@@ -278,16 +279,25 @@ class ChatState {
       return;
     }
 
-    // get form data from e
-    const formData = new FormData(e.currentTarget);
+    // Immediately set loading state to prevent race conditions
+    this.loading = "loading";
 
-    const body = JSON.stringify({
-      id: this.chatThreadId,
-      message: this.input,
-    });
-    formData.append("content", body);
+    try {
+      // get form data from e
+      const formData = new FormData(e.currentTarget);
 
-    this.chat(formData);
+      const body = JSON.stringify({
+        id: this.chatThreadId,
+        message: this.input,
+      });
+      formData.append("content", body);
+
+      await this.chat(formData);
+    } catch (error) {
+      // Reset loading state if chat fails
+      this.loading = "idle";
+      throw error;
+    }
   }
 }
 

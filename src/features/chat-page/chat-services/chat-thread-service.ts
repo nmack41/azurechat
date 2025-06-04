@@ -6,6 +6,7 @@ import {
   userHashedId,
   userSession,
 } from "@/features/auth-page/helpers";
+import { sanitizeInput } from "@/features/common/services/validation-service";
 import { RedirectToChatThread } from "@/features/common/navigation-helpers";
 import { ServerActionResponse } from "@/features/common/server-action-response";
 import { uniqueId } from "@/features/common/util";
@@ -130,13 +131,13 @@ export const SoftDeleteChatThreadForCurrentUser = async (
       }
       const chats = chatResponse.response;
 
-      chats.forEach(async (chat) => {
+      await Promise.all(chats.map(async (chat) => {
         const itemToUpdate = {
           ...chat,
         };
         itemToUpdate.isDeleted = true;
-        await HistoryContainer().items.upsert(itemToUpdate);
-      });
+        return await HistoryContainer().items.upsert(itemToUpdate);
+      }));
 
       const chatDocumentsResponse = await FindAllChatDocuments(chatThreadID);
 
@@ -150,13 +151,13 @@ export const SoftDeleteChatThreadForCurrentUser = async (
         await DeleteDocuments(chatThreadID);
       }
 
-      chatDocuments.forEach(async (chatDocument: ChatDocumentModel) => {
+      await Promise.all(chatDocuments.map(async (chatDocument: ChatDocumentModel) => {
         const itemToUpdate = {
           ...chatDocument,
         };
         itemToUpdate.isDeleted = true;
-        await HistoryContainer().items.upsert(itemToUpdate);
-      });
+        return await HistoryContainer().items.upsert(itemToUpdate);
+      }));
 
       chatThreadResponse.response.isDeleted = true;
       await HistoryContainer().items.upsert(chatThreadResponse.response);
@@ -203,16 +204,50 @@ export const AddExtensionToChatThread = async (props: {
   extensionId: string;
 }): Promise<ServerActionResponse<ChatThreadModel>> => {
   try {
-    const response = await FindChatThreadForCurrentUser(props.chatThreadId);
+    // Validate inputs
+    if (!props.chatThreadId || typeof props.chatThreadId !== 'string') {
+      return {
+        status: "ERROR",
+        errors: [{ message: "Chat thread ID is required" }],
+      };
+    }
+
+    if (!props.extensionId || typeof props.extensionId !== 'string') {
+      return {
+        status: "ERROR",
+        errors: [{ message: "Extension ID is required" }],
+      };
+    }
+
+    // Sanitize inputs
+    const sanitizedThreadId = sanitizeInput(props.chatThreadId, { maxLength: 100, allowNewlines: false });
+    const sanitizedExtensionId = sanitizeInput(props.extensionId, { maxLength: 100, allowNewlines: false });
+
+    if (!sanitizedThreadId || !sanitizedExtensionId) {
+      return {
+        status: "ERROR",
+        errors: [{ message: "Invalid thread ID or extension ID" }],
+      };
+    }
+
+    // Validate ID formats
+    if (!/^[a-zA-Z0-9\-_]{1,100}$/.test(sanitizedThreadId) || !/^[a-zA-Z0-9\-_]{1,100}$/.test(sanitizedExtensionId)) {
+      return {
+        status: "ERROR",
+        errors: [{ message: "Invalid ID format" }],
+      };
+    }
+
+    const response = await FindChatThreadForCurrentUser(sanitizedThreadId);
     if (response.status === "OK") {
       const chatThread = response.response;
 
       const existingExtension = chatThread.extension.find(
-        (e) => e === props.extensionId
+        (e) => e === sanitizedExtensionId
       );
 
       if (existingExtension === undefined) {
-        chatThread.extension.push(props.extensionId);
+        chatThread.extension.push(sanitizedExtensionId);
         return await UpsertChatThread(chatThread);
       }
 
@@ -235,17 +270,58 @@ export const RemoveExtensionFromChatThread = async (props: {
   chatThreadId: string;
   extensionId: string;
 }): Promise<ServerActionResponse<ChatThreadModel>> => {
-  const response = await FindChatThreadForCurrentUser(props.chatThreadId);
-  if (response.status === "OK") {
-    const chatThread = response.response;
-    chatThread.extension = chatThread.extension.filter(
-      (e) => e !== props.extensionId
-    );
+  try {
+    // Validate inputs
+    if (!props.chatThreadId || typeof props.chatThreadId !== 'string') {
+      return {
+        status: "ERROR",
+        errors: [{ message: "Chat thread ID is required" }],
+      };
+    }
 
-    return await UpsertChatThread(chatThread);
+    if (!props.extensionId || typeof props.extensionId !== 'string') {
+      return {
+        status: "ERROR",
+        errors: [{ message: "Extension ID is required" }],
+      };
+    }
+
+    // Sanitize inputs
+    const sanitizedThreadId = sanitizeInput(props.chatThreadId, { maxLength: 100, allowNewlines: false });
+    const sanitizedExtensionId = sanitizeInput(props.extensionId, { maxLength: 100, allowNewlines: false });
+
+    if (!sanitizedThreadId || !sanitizedExtensionId) {
+      return {
+        status: "ERROR",
+        errors: [{ message: "Invalid thread ID or extension ID" }],
+      };
+    }
+
+    // Validate ID formats
+    if (!/^[a-zA-Z0-9\-_]{1,100}$/.test(sanitizedThreadId) || !/^[a-zA-Z0-9\-_]{1,100}$/.test(sanitizedExtensionId)) {
+      return {
+        status: "ERROR",
+        errors: [{ message: "Invalid ID format" }],
+      };
+    }
+
+    const response = await FindChatThreadForCurrentUser(sanitizedThreadId);
+    if (response.status === "OK") {
+      const chatThread = response.response;
+      chatThread.extension = chatThread.extension.filter(
+        (e) => e !== sanitizedExtensionId
+      );
+
+      return await UpsertChatThread(chatThread);
+    }
+
+    return response;
+  } catch (error) {
+    return {
+      status: "ERROR",
+      errors: [{ message: `${error}` }],
+    };
   }
-
-  return response;
 };
 
 export const UpsertChatThread = async (
@@ -329,11 +405,45 @@ export const UpdateChatTitle = async (
   title: string
 ): Promise<ServerActionResponse<ChatThreadModel>> => {
   try {
-    const response = await FindChatThreadForCurrentUser(chatThreadId);
+    // Validate inputs
+    if (!chatThreadId || typeof chatThreadId !== 'string') {
+      return {
+        status: "ERROR",
+        errors: [{ message: "Chat thread ID is required" }],
+      };
+    }
+
+    if (!title || typeof title !== 'string') {
+      return {
+        status: "ERROR",
+        errors: [{ message: "Title is required" }],
+      };
+    }
+
+    // Sanitize inputs
+    const sanitizedThreadId = sanitizeInput(chatThreadId, { maxLength: 100, allowNewlines: false });
+    const sanitizedTitle = sanitizeInput(title, { maxLength: 100, allowNewlines: false });
+
+    if (!sanitizedThreadId || !sanitizedTitle) {
+      return {
+        status: "ERROR",
+        errors: [{ message: "Invalid thread ID or title" }],
+      };
+    }
+
+    // Validate thread ID format
+    if (!/^[a-zA-Z0-9\-_]{1,100}$/.test(sanitizedThreadId)) {
+      return {
+        status: "ERROR",
+        errors: [{ message: "Invalid thread ID format" }],
+      };
+    }
+
+    const response = await FindChatThreadForCurrentUser(sanitizedThreadId);
     if (response.status === "OK") {
       const chatThread = response.response;
-      // take the first 30 characters
-      chatThread.name = title.substring(0, 30);
+      // Use sanitized title, limited to 30 characters for UI consistency
+      chatThread.name = sanitizedTitle.substring(0, 30);
       return await UpsertChatThread(chatThread);
     }
     return response;

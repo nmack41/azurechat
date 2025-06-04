@@ -4,6 +4,7 @@ import "server-only";
 import { userHashedId } from "@/features/auth-page/helpers";
 import { ServerActionResponse } from "@/features/common/server-action-response";
 import { uniqueId } from "@/features/common/util";
+import { validateChatInput } from "@/features/common/services/validation-service";
 import { SqlQuerySpec } from "@azure/cosmos";
 import { HistoryContainer } from "../../common/services/cosmos";
 import { ChatMessageModel, ChatRole, MESSAGE_ATTRIBUTE } from "./models";
@@ -120,6 +121,17 @@ export const CreateChatMessage = async ({
   chatThreadId: string;
   multiModalImage?: string;
 }): Promise<ServerActionResponse<ChatMessageModel>> => {
+  const validation = await validateChatInput({
+    content,
+    name,
+    chatThreadId,
+    multiModalImage
+  });
+  
+  if (validation.status !== "OK") {
+    return validation as ServerActionResponse<ChatMessageModel>;
+  }
+
   const userId = await userHashedId();
   const modelToSave: ChatMessageModel = {
     id: uniqueId(),
@@ -140,6 +152,17 @@ export const UpsertChatMessage = async (
   chatModel: ChatMessageModel
 ): Promise<ServerActionResponse<ChatMessageModel>> => {
   try {
+    const validation = await validateChatInput({
+      content: chatModel.content,
+      name: chatModel.name,
+      chatThreadId: chatModel.threadId,
+      multiModalImage: chatModel.multiModalImage
+    });
+    
+    if (validation.status !== "OK") {
+      return validation as ServerActionResponse<ChatMessageModel>;
+    }
+
     const modelToSave: ChatMessageModel = {
       ...chatModel,
       id: uniqueId(),

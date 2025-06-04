@@ -127,8 +127,8 @@ const configureIdentityProvider = () => {
 
 export const fetchProfilePicture = async (
   profilePictureUrl: string,
-  accessToken: any
-): Promise<any> => {
+  accessToken: string | undefined
+): Promise<string | null> => {
   console.log("Fetching profile picture...");
   var image = null;
   const profilePicture = await fetch(

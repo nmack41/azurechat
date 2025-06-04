@@ -2,6 +2,7 @@
 import "server-only";
 
 import { getCurrentUser, userHashedId } from "@/features/auth-page/helpers";
+import { sanitizeInput } from "@/features/common/services/validation-service";
 import { UpsertChatThread } from "@/features/chat-page/chat-services/chat-thread-service";
 import {
   CHAT_THREAD_ATTRIBUTE,
@@ -78,11 +79,54 @@ export const CreatePersona = async (
   try {
     const user = await getCurrentUser();
 
+    // Validate and sanitize persona fields
+    const sanitizedName = sanitizeInput(props.name, { maxLength: 100, allowNewlines: false });
+    const sanitizedDescription = sanitizeInput(props.description, { maxLength: 500, allowNewlines: true });
+    const sanitizedPersonaMessage = sanitizeInput(props.personaMessage, { maxLength: 2000, allowNewlines: true });
+
+    if (!sanitizedName || !sanitizedDescription || !sanitizedPersonaMessage) {
+      return {
+        status: "ERROR",
+        errors: [
+          {
+            message: "Persona name, description, and system message are required and cannot be empty.",
+          },
+        ],
+      };
+    }
+
+    // Additional validation for system prompt injection
+    const dangerousPatterns = [
+      /ignore.*previous.*instruction/i,
+      /ignore.*above.*instruction/i,
+      /forget.*previous.*instruction/i,
+      /you.*are.*now/i,
+      /act.*as.*if/i,
+      /pretend.*to.*be/i,
+      /roleplay.*as/i,
+      /simulate.*being/i,
+      /behave.*like/i,
+      /respond.*as.*if.*you.*are/i
+    ];
+
+    for (const pattern of dangerousPatterns) {
+      if (pattern.test(sanitizedPersonaMessage)) {
+        return {
+          status: "ERROR",
+          errors: [
+            {
+              message: "System message contains potentially dangerous prompt injection patterns.",
+            },
+          ],
+        };
+      }
+    }
+
     const modelToSave: PersonaModel = {
       id: uniqueId(),
-      name: props.name,
-      description: props.description,
-      personaMessage: props.personaMessage,
+      name: sanitizedName,
+      description: sanitizedDescription,
+      personaMessage: sanitizedPersonaMessage,
       isPublished: user.isAdmin ? props.isPublished : false,
       userId: await userHashedId(),
       createdAt: new Date(),
@@ -193,11 +237,54 @@ export const UpsertPersona = async (
       const { response: persona } = personaResponse;
       const user = await getCurrentUser();
 
+      // Validate and sanitize persona fields
+      const sanitizedName = sanitizeInput(personaInput.name, { maxLength: 100, allowNewlines: false });
+      const sanitizedDescription = sanitizeInput(personaInput.description, { maxLength: 500, allowNewlines: true });
+      const sanitizedPersonaMessage = sanitizeInput(personaInput.personaMessage, { maxLength: 2000, allowNewlines: true });
+
+      if (!sanitizedName || !sanitizedDescription || !sanitizedPersonaMessage) {
+        return {
+          status: "ERROR",
+          errors: [
+            {
+              message: "Persona name, description, and system message are required and cannot be empty.",
+            },
+          ],
+        };
+      }
+
+      // Additional validation for system prompt injection
+      const dangerousPatterns = [
+        /ignore.*previous.*instruction/i,
+        /ignore.*above.*instruction/i,
+        /forget.*previous.*instruction/i,
+        /you.*are.*now/i,
+        /act.*as.*if/i,
+        /pretend.*to.*be/i,
+        /roleplay.*as/i,
+        /simulate.*being/i,
+        /behave.*like/i,
+        /respond.*as.*if.*you.*are/i
+      ];
+
+      for (const pattern of dangerousPatterns) {
+        if (pattern.test(sanitizedPersonaMessage)) {
+          return {
+            status: "ERROR",
+            errors: [
+              {
+                message: "System message contains potentially dangerous prompt injection patterns.",
+              },
+            ],
+          };
+        }
+      }
+
       const modelToUpdate: PersonaModel = {
         ...persona,
-        name: personaInput.name,
-        description: personaInput.description,
-        personaMessage: personaInput.personaMessage,
+        name: sanitizedName,
+        description: sanitizedDescription,
+        personaMessage: sanitizedPersonaMessage,
         isPublished: user.isAdmin
           ? personaInput.isPublished
           : persona.isPublished,

@@ -52,10 +52,23 @@ export interface ChatDocumentModel {
   type: typeof CHAT_DOCUMENT_ATTRIBUTE;
 }
 
+export interface ToolParameters {
+  type: "object";
+  properties: Record<string, {
+    type: string;
+    description?: string;
+    enum?: string[];
+    items?: {
+      type: string;
+    };
+  }>;
+  required?: string[];
+}
+
 export interface ToolsInterface {
   name: string;
   description: string;
-  parameters: any;
+  parameters: ToolParameters;
 }
 
 export type MenuItemsGroupName = "Bookmarked" | "Past 7 days" | "Previous";
@@ -64,9 +77,17 @@ export type MenuItemsGroup = {
   groupName: MenuItemsGroupName;
 } & ChatThreadModel;
 
+export interface CitationContent {
+  title?: string;
+  content: string;
+  filepath?: string;
+  url?: string;
+  metadata?: Record<string, string | number>;
+}
+
 export type ChatCitationModel = {
   id: string;
-  content: any;
+  content: CitationContent;
   userId: string;
   type: typeof CHAT_CITATION_ATTRIBUTE;
 };

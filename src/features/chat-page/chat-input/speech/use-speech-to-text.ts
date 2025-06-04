@@ -5,6 +5,7 @@ import {
   SpeechConfig,
   SpeechRecognizer,
 } from "microsoft-cognitiveservices-speech-sdk";
+import { useEffect } from "react";
 import { proxy, useSnapshot } from "valtio";
 import { chatStore } from "../../chat-store";
 import { GetSpeechToken } from "./speech-service";
@@ -62,9 +63,20 @@ class SpeechToText {
 
   public stopRecognition() {
     if (speechRecognizer) {
-      speechRecognizer.stopContinuousRecognitionAsync();
+      speechRecognizer.stopContinuousRecognitionAsync(() => {
+        // Properly dispose of the recognizer to prevent memory leaks
+        if (speechRecognizer) {
+          speechRecognizer.close();
+          speechRecognizer = undefined;
+        }
+      });
       this.isMicrophoneReady = false;
     }
+  }
+
+  public dispose() {
+    // Cleanup method for when the component unmounts
+    this.stopRecognition();
   }
 
   public userDidUseMicrophone() {
@@ -78,5 +90,14 @@ class SpeechToText {
 export const speechToTextStore = proxy(new SpeechToText());
 
 export const useSpeechToText = () => {
-  return useSnapshot(speechToTextStore);
+  const snapshot = useSnapshot(speechToTextStore);
+  
+  useEffect(() => {
+    // Cleanup on unmount to prevent memory leaks
+    return () => {
+      speechToTextStore.dispose();
+    };
+  }, []);
+  
+  return snapshot;
 };

@@ -1,4 +1,5 @@
 import { getCurrentUser } from "@/features/auth-page/helpers";
+import { sanitizeInput } from "@/features/common/services/validation-service";
 import {
   CHAT_THREAD_ATTRIBUTE,
   ChatMessageModel,
@@ -19,6 +20,30 @@ export const FindAllChatThreadsForAdmin = async (
     return {
       status: "ERROR",
       errors: [{ message: "You are not authorized to perform this action" }],
+    };
+  }
+
+  // Validate input parameters
+  if (typeof limit !== 'number' || typeof offset !== 'number') {
+    return {
+      status: "ERROR",
+      errors: [{ message: "Limit and offset must be numbers" }],
+    };
+  }
+
+  // Validate limit bounds (1 to 1000)
+  if (limit < 1 || limit > 1000) {
+    return {
+      status: "ERROR",
+      errors: [{ message: "Limit must be between 1 and 1000" }],
+    };
+  }
+
+  // Validate offset bounds (non-negative, max 100,000 for performance)
+  if (offset < 0 || offset > 100000) {
+    return {
+      status: "ERROR",
+      errors: [{ message: "Offset must be between 0 and 100,000" }],
     };
   }
 
@@ -69,6 +94,32 @@ export const FindAllChatMessagesForAdmin = async (
     };
   }
 
+  // Validate input parameters
+  if (!chatThreadID || typeof chatThreadID !== 'string') {
+    return {
+      status: "ERROR",
+      errors: [{ message: "Chat thread ID is required and must be a string" }],
+    };
+  }
+
+  // Sanitize thread ID
+  const sanitizedThreadId = sanitizeInput(chatThreadID, { maxLength: 100, allowNewlines: false });
+
+  if (!sanitizedThreadId) {
+    return {
+      status: "ERROR",
+      errors: [{ message: "Invalid chat thread ID" }],
+    };
+  }
+
+  // Validate thread ID format
+  if (!/^[a-zA-Z0-9\-_]{1,100}$/.test(sanitizedThreadId)) {
+    return {
+      status: "ERROR",
+      errors: [{ message: "Invalid chat thread ID format" }],
+    };
+  }
+
   try {
     const querySpec: SqlQuerySpec = {
       query:
@@ -80,7 +131,7 @@ export const FindAllChatMessagesForAdmin = async (
         },
         {
           name: "@threadId",
-          value: chatThreadID,
+          value: sanitizedThreadId,
         },
       ],
     };

@@ -251,6 +251,78 @@ export function validateChatMessage(message: string): ServerActionResponse<strin
 }
 
 /**
+ * Validate chat input including content, name, thread ID, and optional image
+ */
+export async function validateChatInput({
+  content,
+  name,
+  chatThreadId,
+  multiModalImage
+}: {
+  content: string;
+  name: string;
+  chatThreadId: string;
+  multiModalImage?: string;
+}): Promise<ServerActionResponse<void>> {
+  const errors: { message: string }[] = [];
+
+  // Validate content
+  const contentValidation = validateChatMessage(content);
+  if (contentValidation.status !== "OK") {
+    errors.push(...contentValidation.errors!);
+  }
+
+  // Validate name
+  if (!name || typeof name !== 'string') {
+    errors.push({ message: "Name is required" });
+  } else {
+    const sanitizedName = sanitizeInput(name, { maxLength: 100, allowNewlines: false });
+    if (sanitizedName.length === 0) {
+      errors.push({ message: "Name cannot be empty" });
+    }
+  }
+
+  // Validate chat thread ID
+  if (!chatThreadId || typeof chatThreadId !== 'string') {
+    errors.push({ message: "Chat thread ID is required" });
+  } else if (!/^[a-zA-Z0-9\-_]{1,50}$/.test(chatThreadId)) {
+    errors.push({ message: "Invalid chat thread ID format" });
+  }
+
+  // Validate multimodal image if provided
+  if (multiModalImage) {
+    if (typeof multiModalImage !== 'string') {
+      errors.push({ message: "Invalid image data format" });
+    } else {
+      // Basic base64 validation
+      const base64Regex = /^data:image\/(jpeg|jpg|png|gif|webp);base64,([A-Za-z0-9+/=]+)$/;
+      if (!base64Regex.test(multiModalImage)) {
+        errors.push({ message: "Invalid base64 image format" });
+      } else {
+        // Check image size (base64 encoded)
+        const base64Data = multiModalImage.split(',')[1];
+        const imageSizeBytes = (base64Data.length * 3) / 4;
+        if (imageSizeBytes > 5 * 1024 * 1024) { // 5MB limit
+          errors.push({ message: "Image size exceeds 5MB limit" });
+        }
+      }
+    }
+  }
+
+  if (errors.length > 0) {
+    return {
+      status: "ERROR",
+      errors
+    };
+  }
+
+  return {
+    status: "OK",
+    response: undefined
+  };
+}
+
+/**
  * Generate cryptographically secure random string
  */
 export function generateSecureSecret(length: number = 32): string {
