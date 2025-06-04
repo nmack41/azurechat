@@ -129,7 +129,12 @@ jest.mock('microsoft-cognitiveservices-speech-sdk', () => ({
 
 // Mock NextAuth
 jest.mock('next-auth', () => ({
-  default: jest.fn(),
+  default: jest.fn(() => ({
+    handlers: {},
+    auth: jest.fn(),
+    signIn: jest.fn(),
+    signOut: jest.fn(),
+  })),
 }))
 
 jest.mock('next-auth/react', () => ({
@@ -149,18 +154,241 @@ jest.mock('next-auth/react', () => ({
   getSession: jest.fn(),
 }))
 
-// Global test utilities
-global.fetch = jest.fn()
-global.FormData = jest.fn(() => ({
-  append: jest.fn(),
-  get: jest.fn(),
-  set: jest.fn(),
+// Mock auth API to prevent NextAuth initialization issues
+jest.mock('@/features/auth-page/auth-api', () => ({
+  handlers: {
+    GET: jest.fn(),
+    POST: jest.fn(),
+  },
+  auth: jest.fn(),
+  signIn: jest.fn(),
+  signOut: jest.fn(),
 }))
 
-// Add TextEncoder/TextDecoder for Node.js environment
+// Mock auth helpers 
+jest.mock('@/features/auth-page/helpers', () => ({
+  userHashedId: jest.fn().mockResolvedValue('test-hashed-user-id'),
+  getCurrentUser: jest.fn().mockResolvedValue({
+    name: 'Test User',
+    email: 'test@example.com',
+    image: 'avatar.jpg',
+  }),
+  isCurrentUserAdmin: jest.fn().mockResolvedValue(false),
+  hashValue: jest.fn().mockImplementation((value) => `hashed-${value}`),
+}))
+
+// Mock nanoid to avoid ES module issues
+jest.mock('nanoid', () => ({
+  nanoid: jest.fn(() => 'mock-nanoid-' + Math.random().toString(36).substr(2, 9)),
+}))
+
+// Mock common utilities
+jest.mock('@/features/common/util', () => ({
+  unique: jest.fn().mockImplementation((arr) => [...new Set(arr)]),
+  debounce: jest.fn().mockImplementation((fn) => fn),
+  formatDate: jest.fn().mockImplementation((date) => date.toISOString()),
+}))
+
+// Mock validation service
+jest.mock('@/features/common/services/validation-service', () => ({
+  sanitizeInput: jest.fn().mockImplementation((input, options = {}) => {
+    if (!input || typeof input !== 'string') return null;
+    if (input.length > (options.maxLength || 1000)) return null;
+    // Basic sanitization - remove dangerous characters
+    return input.replace(/[<>&"']/g, '');
+  }),
+  validateFileType: jest.fn().mockReturnValue(true),
+  validateImageBase64: jest.fn().mockReturnValue(true),
+  isValidUrl: jest.fn().mockReturnValue(true),
+}))
+
+// Mock cosmos service
+jest.mock('@/features/common/services/cosmos', () => ({
+  CosmosDBContainer: jest.fn().mockResolvedValue({
+    items: {
+      query: jest.fn().mockReturnValue({
+        fetchAll: jest.fn().mockResolvedValue({ resources: [] }),
+      }),
+      create: jest.fn().mockResolvedValue({ resource: {} }),
+      upsert: jest.fn().mockResolvedValue({ resource: {} }),
+    },
+    item: jest.fn().mockReturnValue({
+      read: jest.fn().mockResolvedValue({ resource: {} }),
+      replace: jest.fn().mockResolvedValue({ resource: {} }),
+      delete: jest.fn().mockResolvedValue({ resource: {} }),
+    }),
+  }),
+}))
+
+// Global test utilities
+global.fetch = jest.fn()
+
+// Add Web API globals for Node.js environment
 const { TextEncoder, TextDecoder } = require('util')
 global.TextEncoder = TextEncoder
 global.TextDecoder = TextDecoder
+
+// Add Web Streams API
+const { ReadableStream, WritableStream, TransformStream } = require('stream/web');
+global.ReadableStream = ReadableStream;
+global.WritableStream = WritableStream;
+global.TransformStream = TransformStream;
+
+// Mock Web API Request/Response for Node.js environment
+class MockHeaders {
+  constructor(init) {
+    this.data = new Map();
+    if (init) {
+      if (typeof init === 'object' && init !== null) {
+        for (const [key, value] of Object.entries(init)) {
+          this.set(key, value);
+        }
+      }
+    }
+  }
+  
+  get(name) {
+    return this.data.get(name.toLowerCase()) || null;
+  }
+  
+  set(name, value) {
+    this.data.set(name.toLowerCase(), String(value));
+  }
+  
+  has(name) {
+    return this.data.has(name.toLowerCase());
+  }
+  
+  delete(name) {
+    this.data.delete(name.toLowerCase());
+  }
+  
+  entries() {
+    return this.data.entries();
+  }
+  
+  keys() {
+    return this.data.keys();
+  }
+  
+  values() {
+    return this.data.values();
+  }
+  
+  forEach(callback) {
+    for (const [key, value] of this.data.entries()) {
+      callback(value, key, this);
+    }
+  }
+}
+
+class MockRequest {
+  constructor(input, init = {}) {
+    this.url = input;
+    this.method = init.method || 'GET';
+    this.headers = new MockHeaders(init.headers);
+    this.body = init.body || null;
+  }
+}
+
+class MockResponse {
+  constructor(body, init = {}) {
+    this.body = body;
+    this.status = init.status || 200;
+    this.statusText = init.statusText || 'OK';
+    this.headers = new MockHeaders(init.headers);
+    this.ok = this.status >= 200 && this.status < 300;
+  }
+  
+  async text() {
+    if (typeof this.body === 'string') {
+      return this.body;
+    }
+    if (this.body instanceof ArrayBuffer) {
+      return new TextDecoder().decode(this.body);
+    }
+    return String(this.body);
+  }
+  
+  async json() {
+    const text = await this.text();
+    return JSON.parse(text);
+  }
+  
+  async arrayBuffer() {
+    if (this.body instanceof ArrayBuffer) {
+      return this.body;
+    }
+    const text = await this.text();
+    return new TextEncoder().encode(text).buffer;
+  }
+}
+
+global.Request = MockRequest;
+global.Response = MockResponse;
+global.Headers = MockHeaders;
+
+// Enhanced FormData mock
+class MockFormData {
+  constructor() {
+    this.data = new Map();
+  }
+  
+  append(key, value) {
+    if (this.data.has(key)) {
+      const existing = this.data.get(key);
+      if (Array.isArray(existing)) {
+        existing.push(value);
+      } else {
+        this.data.set(key, [existing, value]);
+      }
+    } else {
+      this.data.set(key, value);
+    }
+  }
+  
+  get(key) {
+    const value = this.data.get(key);
+    return Array.isArray(value) ? value[0] : value;
+  }
+  
+  getAll(key) {
+    const value = this.data.get(key);
+    return Array.isArray(value) ? value : value ? [value] : [];
+  }
+  
+  has(key) {
+    return this.data.has(key);
+  }
+  
+  delete(key) {
+    this.data.delete(key);
+  }
+  
+  set(key, value) {
+    this.data.set(key, value);
+  }
+  
+  entries() {
+    return this.data.entries();
+  }
+  
+  keys() {
+    return this.data.keys();
+  }
+  
+  values() {
+    return this.data.values();
+  }
+  
+  forEach(callback) {
+    for (const [key, value] of this.data.entries()) {
+      callback(value, key, this);
+    }
+  }
+}
+
+global.FormData = MockFormData;
 
 // Suppress console warnings in tests unless explicitly testing them
 const originalConsoleWarn = console.warn

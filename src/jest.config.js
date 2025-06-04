@@ -14,7 +14,7 @@ const customJestConfig = {
     '^@/(.*)$': '<rootDir>/$1',
   },
   transformIgnorePatterns: [
-    'node_modules/(?!((@azure|openai)/.*))',
+    'node_modules/(?!((@azure|openai|nanoid)/.*))',
   ],
   collectCoverageFrom: [
     'features/common/services/**/*.{js,jsx,ts,tsx}',
