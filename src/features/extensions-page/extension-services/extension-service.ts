@@ -168,8 +168,12 @@ export const EnsureExtensionOperation = async (
   const hashedId = await userHashedId();
 
   if (extensionResponse.status === "OK") {
-    if (currentUser.isAdmin || extensionResponse.response.userId === hashedId) {
+    // Only allow access if the user owns the extension
+    if (extensionResponse.response.userId === hashedId) {
       return extensionResponse;
+    } else {
+      // Log unauthorized access attempts
+      console.warn(`Unauthorized extension access attempt: User ${currentUser.email} (admin: ${currentUser.isAdmin}) tried to access extension ${id} owned by ${extensionResponse.response.userId}`);
     }
   }
 

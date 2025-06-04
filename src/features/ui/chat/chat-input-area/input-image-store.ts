@@ -36,11 +36,32 @@ class InputImageState {
   public async OnFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (file) {
-      const base64 = await this.fileToBase64(file);
-      const url = URL.createObjectURL(file);
-      this.previewImage = url;
-      this.base64Image = base64;
-      this.fileUrl = file.name;
+      // Client-side validation
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      const maxSize = 5 * 1024 * 1024; // 5MB
+
+      if (!allowedTypes.includes(file.type)) {
+        alert('Invalid image format. Only JPEG, PNG, GIF, and WebP are allowed.');
+        event.target.value = ''; // Reset input
+        return;
+      }
+
+      if (file.size > maxSize) {
+        alert('Image size exceeds 5MB limit.');
+        event.target.value = ''; // Reset input
+        return;
+      }
+
+      try {
+        const base64 = await this.fileToBase64(file);
+        const url = URL.createObjectURL(file);
+        this.previewImage = url;
+        this.base64Image = base64;
+        this.fileUrl = file.name;
+      } catch (error) {
+        alert('Failed to process image. Please try again.');
+        event.target.value = ''; // Reset input
+      }
     }
   }
 }

@@ -134,8 +134,12 @@ export const EnsurePersonaOperation = async (
   const hashedId = await userHashedId();
 
   if (personaResponse.status === "OK") {
-    if (currentUser.isAdmin || personaResponse.response.userId === hashedId) {
+    // Only allow access if the user owns the persona
+    if (personaResponse.response.userId === hashedId) {
       return personaResponse;
+    } else {
+      // Log unauthorized access attempts
+      console.warn(`Unauthorized persona access attempt: User ${currentUser.email} (admin: ${currentUser.isAdmin}) tried to access persona ${personaId} owned by ${personaResponse.response.userId}`);
     }
   }
 

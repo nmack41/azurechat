@@ -211,9 +211,9 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
   resource configLogs 'config' = {
     name: 'logs'
     properties: {
-      applicationLogs: { fileSystem: { level: 'Verbose' } }
-      detailedErrorMessages: { enabled: true }
-      failedRequestsTracing: { enabled: true }
+      applicationLogs: { fileSystem: { level: 'Warning' } }
+      detailedErrorMessages: { enabled: false }
+      failedRequestsTracing: { enabled: false }
       httpLogs: { fileSystem: { enabled: true, retentionInDays: 1, retentionInMb: 35 } }
     }
   }

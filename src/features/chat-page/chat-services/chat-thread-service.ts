@@ -175,12 +175,23 @@ export const EnsureChatThreadOperation = async (
   chatThreadID: string
 ): Promise<ServerActionResponse<ChatThreadModel>> => {
   const response = await FindChatThreadForCurrentUser(chatThreadID);
-  const currentUser = await getCurrentUser();
   const hashedId = await userHashedId();
 
   if (response.status === "OK") {
-    if (currentUser.isAdmin || response.response.userId === hashedId) {
+    // Only allow access if the user owns the chat thread
+    if (response.response.userId === hashedId) {
       return response;
+    } else {
+      // Log unauthorized access attempts for security monitoring
+      const currentUser = await getCurrentUser();
+      console.warn(`Unauthorized chat access attempt: User ${currentUser.email} (admin: ${currentUser.isAdmin}) tried to access thread ${chatThreadID} owned by ${response.response.userId}`);
+      
+      return {
+        status: "UNAUTHORIZED",
+        errors: [{
+          message: "You don't have permission to access this chat thread"
+        }]
+      };
     }
   }
 

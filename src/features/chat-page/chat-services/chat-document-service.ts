@@ -8,6 +8,7 @@ import { RevalidateCache } from "@/features/common/navigation-helpers";
 import { ServerActionResponse } from "@/features/common/server-action-response";
 import { DocumentIntelligenceInstance } from "@/features/common/services/document-intelligence";
 import { uniqueId } from "@/features/common/util";
+import { validateDocumentUpload } from "@/features/common/services/validation-service";
 import { SqlQuerySpec } from "@azure/cosmos";
 import { EnsureIndexIsCreated } from "./azure-ai-search/azure-ai-search";
 import { CHAT_DOCUMENT_ATTRIBUTE, ChatDocumentModel } from "./models";
@@ -66,14 +67,27 @@ const LoadFile = async (
     if (debug) console.log("LoadFile: Loading file from form data.");
     const file: File | null = formData.get("file") as unknown as File;
 
-    const fileSize = process.env.MAX_UPLOAD_DOCUMENT_SIZE
-      ? Number(process.env.MAX_UPLOAD_DOCUMENT_SIZE)
-      : MAX_UPLOAD_DOCUMENT_SIZE;
+    if (!file) {
+      return {
+        status: "ERROR",
+        errors: [{ message: "No file provided" }]
+      };
+    }
 
-    if (file && file.size < fileSize) {
-      if (debug) console.log("LoadFile: File size is within the acceptable limit.");
+    // Comprehensive file validation
+    const validationResult = await validateDocumentUpload(file);
+    if (validationResult.status !== "OK") {
+      console.error("LoadFile: File validation failed.", validationResult.errors);
+      return {
+        status: "ERROR",
+        errors: validationResult.errors
+      };
+    }
+
+    if (debug) console.log("LoadFile: File validation passed. Processing document.");
+
+    try {
       const client = DocumentIntelligenceInstance();
-
       const blob = new Blob([file], { type: file.type });
 
       if (debug) console.log("LoadFile: Beginning document analysis.");
@@ -96,15 +110,13 @@ const LoadFile = async (
         status: "OK",
         response: docs,
       };
-    } else {
-      console.error("LoadFile: File size is too large.");
+    } catch (docError) {
+      console.error("LoadFile: Document processing error:", docError);
       return {
         status: "ERROR",
-        errors: [
-          {
-            message: `File is too large and must be less than ${MAX_UPLOAD_DOCUMENT_SIZE} bytes.`,
-          },
-        ],
+        errors: [{
+          message: "Failed to process document. Please ensure the file is a valid document format."
+        }]
       };
     }
   } catch (e) {
