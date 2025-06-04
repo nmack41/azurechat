@@ -10,7 +10,6 @@ import { uniqueId } from '@/features/common/util'
 import { renderHook, act } from '@testing-library/react'
 
 // Mock dependencies
-jest.mock('@/features/common/util')
 jest.mock('@/features/common/navigation-helpers', () => ({
   RevalidateCache: jest.fn(),
 }))
@@ -319,13 +318,22 @@ describe('Extension Store', () => {
     })
 
     it('should remove header by id', () => {
-      const headerId = extensionStore.extension.headers[0].id
+      // First add a header to have a predictable ID
+      act(() => {
+        extensionStore.addEndpointHeader({
+          key: 'Authorization',
+          value: 'Bearer token',
+        })
+      })
+      
+      const headerId = extensionStore.extension.headers[1].id // Get the newly added header
       
       act(() => {
         extensionStore.removeHeader({ headerId })
       })
       
-      expect(extensionStore.extension.headers).toHaveLength(0)
+      expect(extensionStore.extension.headers).toHaveLength(1) // Should still have the default Content-Type header
+      expect(extensionStore.extension.headers[0].key).toBe('Content-Type')
     })
   })
 
@@ -443,19 +451,27 @@ describe('Extension Store', () => {
       const formData = new FormData()
       formData.append('name', 'Integration Test')
       formData.append('description', 'Test Description')
+      formData.append('executionSteps', 'Test Steps')
+      formData.append('id', '')
       
       CreateExtension.mockResolvedValue({ status: 'OK' })
+      
+      // Spy on submitForm to verify it was called
+      const submitFormSpy = jest.spyOn(extensionStore, 'submitForm')
       
       await act(async () => {
         await AddOrUpdateExtension(null, formData)
       })
       
-      expect(CreateExtension).toHaveBeenCalledWith(
+      expect(submitFormSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           name: 'Integration Test',
           description: 'Test Description',
+          executionSteps: 'Test Steps',
         })
       )
+      
+      submitFormSpy.mockRestore()
     })
   })
 

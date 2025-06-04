@@ -184,9 +184,11 @@ jest.mock('nanoid', () => ({
 
 // Mock common utilities
 jest.mock('@/features/common/util', () => ({
+  uniqueId: jest.fn(() => 'mock-unique-id-' + Math.random().toString(36).substr(2, 9)),
   unique: jest.fn().mockImplementation((arr) => [...new Set(arr)]),
   debounce: jest.fn().mockImplementation((fn) => fn),
   formatDate: jest.fn().mockImplementation((date) => date.toISOString()),
+  sortByTimestamp: jest.fn().mockImplementation((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime()),
 }))
 
 // Mock validation service

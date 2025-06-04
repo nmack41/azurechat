@@ -54,3 +54,6 @@ export const onKeyUp = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
 export const useChatInputDynamicHeight = () => {
   return useSnapshot(state);
 };
+
+// Export state for testing
+export const chatInputState = state;
