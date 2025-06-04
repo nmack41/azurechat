@@ -1,4 +1,3 @@
-"use server";
 import "server-only";
 
 import { OpenAIInstance } from "@/features/common/services/openai";
