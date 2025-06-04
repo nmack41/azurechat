@@ -42,9 +42,13 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     "/unauthorized/:path*",
-    "/reporting/:path*",
-    "/api/chat:path*",
-    "/api/images:path*",
+    "/reporting/:path*", 
+    "/api/chat/:path*",
+    "/api/document/:path*",
+    "/api/images/:path*",
     "/chat/:path*",
+    "/persona/:path*",
+    "/prompt/:path*",
+    "/extensions/:path*"
   ],
 };
