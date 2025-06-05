@@ -5,9 +5,9 @@ import { MenuTray } from "@/features/main-menu/menu-tray";
 import { cn } from "@/ui/lib";
 
 import { AI_NAME } from "@/features/theme/theme-config";
-import { DisplayError } from "@/features/ui/error/display-error";
-import { ChatErrorBoundary } from "@/features/ui/error-boundary";
-import { ScrollArea } from "@/features/ui/scroll-area";
+import { DisplayError } from "@/ui/error/display-error";
+import { ChatErrorBoundary } from "@/ui/error-boundary";
+import { ScrollArea } from "@/ui/scroll-area";
 
 export const dynamic = "force-dynamic";
 

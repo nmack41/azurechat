@@ -1,5 +1,5 @@
-import { uniqueId } from "@/features/common/util";
-import { HeroButton } from "@/features/ui/hero";
+import { uniqueId } from "@/utils/util";
+import { HeroButton } from "@/ui/hero";
 import { Globe } from "lucide-react";
 import { ExtensionModel } from "../extension-services/models";
 import { extensionStore } from "../extension-store";

@@ -1,4 +1,4 @@
-import { sortByTimestamp } from "@/features/common/util";
+import { sortByTimestamp } from "@/utils/util";
 import { FC } from "react";
 import {
   ChatThreadModel,

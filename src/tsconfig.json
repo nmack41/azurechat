@@ -32,11 +32,14 @@
       
       // Service layer paths
       "@/services/*": ["./features/common/services/*"],
+      "@/services": ["./features/common/services"],
       "@/utils/*": ["./features/common/*"],
       
       // Observability and monitoring
       "@/observability/*": ["./features/common/observability/*"],
+      "@/observability": ["./features/common/observability"],
       "@/errors/*": ["./features/common/errors/*"],
+      "@/errors": ["./features/common/errors"],
       
       // Valtio store patterns
       "@/valtio/*": ["./features/common/valtio-patterns/*"],

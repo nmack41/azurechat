@@ -1,7 +1,7 @@
 "use server";
 import "server-only";
 
-import { OpenAIInstance } from "@/features/common/services/openai";
+import { OpenAIInstance } from "@/services/openai";
 import { FindExtensionByID } from "@/features/extensions-page/extension-services/extension-service";
 import { RunnableToolFunction } from "openai/lib/RunnableFunction";
 import { ChatCompletionStreamingRunner } from "openai/resources/beta/chat/completions";

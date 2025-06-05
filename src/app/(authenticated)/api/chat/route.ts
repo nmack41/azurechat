@@ -1,12 +1,12 @@
 import { ChatAPIEntry } from "@/features/chat-page/chat-services/chat-api/chat-api";
 import { UserPrompt } from "@/features/chat-page/chat-services/models";
-import { validateChatMessage } from "@/features/common/services/validation-service";
+import { validateChatMessage } from "@/services/validation-service";
 import { 
   getCorrelationId, 
   CORRELATION_ID_HEADER,
   addCorrelationHeaders
-} from "@/features/common/observability/correlation-middleware";
-import { ErrorSerializer } from "@/features/common/errors";
+} from "@/observability/correlation-middleware";
+import { ErrorSerializer } from "@/errors";
 
 export async function POST(req: Request) {
   // Extract correlation ID from request

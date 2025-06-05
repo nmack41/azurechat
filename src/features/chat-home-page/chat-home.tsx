@@ -4,8 +4,8 @@ import { ExtensionModel } from "@/features/extensions-page/extension-services/mo
 import { PersonaCard } from "@/features/persona-page/persona-card/persona-card";
 import { PersonaModel } from "@/features/persona-page/persona-services/models";
 import { AI_DESCRIPTION, AI_NAME } from "@/features/theme/theme-config";
-import { Hero } from "@/features/ui/hero";
-import { ScrollArea } from "@/features/ui/scroll-area";
+import { Hero } from "@/ui/hero";
+import { ScrollArea } from "@/ui/scroll-area";
 import Image from "next/image";
 import { FC } from "react";
 

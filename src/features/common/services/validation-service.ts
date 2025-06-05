@@ -1,6 +1,6 @@
 import "server-only";
 
-import { ServerActionResponse } from "@/features/common/server-action-response";
+import { ServerActionResponse } from "@/utils/server-action-response";
 
 // ABOUTME: Provides comprehensive security validation for file uploads and user inputs
 // ABOUTME: Includes MIME type validation, content scanning, and XSS protection

@@ -1,7 +1,7 @@
-import { Button } from "@/features/ui/button";
-import { Input } from "@/features/ui/input";
-import { Label } from "@/features/ui/label";
-import { cn } from "@/features/ui/lib";
+import { Button } from "@/ui/button";
+import { Input } from "@/ui/input";
+import { Label } from "@/ui/label";
+import { cn } from "@/ui/lib";
 import {
   Select,
   SelectContent,
@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/features/ui/select";
-import { SheetTitle } from "@/features/ui/sheet";
+import { SheetTitle } from "@/ui/sheet";
 import { javascript } from "@codemirror/lang-javascript";
 import CodeMirror from "@uiw/react-codemirror";
 import { ChevronDown, ChevronUp, Copy, Plus, Trash } from "lucide-react";

@@ -4,9 +4,9 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { Card } from "@/features/ui/card";
-import { Badge } from "@/features/ui/badge";
-import { Button } from "@/features/ui/button";
+import { Card } from "@/ui/card";
+import { Badge } from "@/ui/badge";
+import { Button } from "@/ui/button";
 import { performanceMonitor, QueryMetric, AggregatedMetric, PerformanceAlert } from "./performance-monitor";
 
 interface PerformanceDashboardProps {

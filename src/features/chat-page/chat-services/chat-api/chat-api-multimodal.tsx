@@ -1,6 +1,6 @@
 import "server-only";
 
-import { OpenAIInstance } from "@/features/common/services/openai";
+import { OpenAIInstance } from "@/services/openai";
 import { ChatCompletionStreamingRunner } from "openai/resources/beta/chat/completions";
 import { ChatThreadModel } from "../models";
 export const ChatApiMultimodal = (props: {

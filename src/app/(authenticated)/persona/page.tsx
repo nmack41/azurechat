@@ -1,6 +1,6 @@
 import { ChatPersonaPage } from "@/features/persona-page/persona-page";
 import { FindAllPersonaForCurrentUser } from "@/features/persona-page/persona-services/persona-service";
-import { DisplayError } from "@/features/ui/error/display-error";
+import { DisplayError } from "@/ui/error/display-error";
 
 export default async function Home() {
   const personasResponse = await FindAllPersonaForCurrentUser();

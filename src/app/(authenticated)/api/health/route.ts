@@ -2,8 +2,8 @@
 // ABOUTME: Provides comprehensive health information for all dependencies
 
 import { NextRequest, NextResponse } from 'next/server';
-import { healthService } from '@/features/common/observability/health-service';
-import { ErrorSerializer } from '@/features/common/errors';
+import { healthService } from '@/observability/health-service';
+import { ErrorSerializer } from '@/errors';
 
 /**
  * GET /api/health - Get overall system health

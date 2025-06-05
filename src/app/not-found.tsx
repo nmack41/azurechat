@@ -5,10 +5,10 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { Button } from "@/features/ui/button";
-import { Card } from "@/features/ui/card";
-import { appInsights } from "@/features/common/observability/app-insights";
-import { logger } from "@/features/common/observability/logger";
+import { Button } from "@/ui/button";
+import { Card } from "@/ui/card";
+import { appInsights } from "@/observability/app-insights";
+import { logger } from "@/observability/logger";
 
 export default function NotFound() {
   useEffect(() => {

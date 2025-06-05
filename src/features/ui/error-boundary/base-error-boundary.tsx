@@ -4,7 +4,7 @@
 'use client';
 
 import React, { Component, ReactNode, ErrorInfo } from 'react';
-import { BaseError, ErrorSeverity, ErrorCategory, ErrorSerializer } from '@/features/common/errors';
+import { BaseError, ErrorSeverity, ErrorCategory, ErrorSerializer } from '@/errors';
 
 /**
  * Props for error boundary components

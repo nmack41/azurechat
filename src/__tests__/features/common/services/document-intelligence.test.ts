@@ -1,4 +1,4 @@
-import { DocumentIntelligenceInstance } from '@/features/common/services/document-intelligence'
+import { DocumentIntelligenceInstance } from '@/services/document-intelligence'
 import { AzureKeyCredential, DocumentAnalysisClient } from '@azure/ai-form-recognizer'
 import { DefaultAzureCredential } from '@azure/identity'
 

@@ -5,8 +5,7 @@
 export { 
   CosmosInstance, 
   HistoryContainer, 
-  ConfigContainer, 
-  CosmosOperations 
+  ConfigContainer 
 } from './cosmos';
 
 export { 
@@ -23,9 +22,9 @@ export {
 
 // Azure Services
 export { 
-  OpenAI,
-  ChatRole,
-  AzureChatCompletion
+  OpenAIInstance,
+  OpenAIEmbeddingInstance,
+  OpenAIDALLEInstance
 } from './openai';
 
 export {
@@ -33,41 +32,42 @@ export {
 } from './openai-service';
 
 export { 
-  AzureSearchService,
-  SearchDocument,
-  SearchOptions
+  GetCredential,
+  AzureAISearchInstance,
+  AzureAISearchIndexClientInstance,
+  AzureAISearchIndexerClientInstance
 } from './ai-search';
 
 export { 
-  DocumentIntelligence,
-  DocumentAnalysisResult
+  DocumentIntelligenceInstance
 } from './document-intelligence';
 
 export { 
-  AzureKeyVault,
-  SecretValue
+  AzureKeyVaultInstance
 } from './key-vault';
 
 export { 
-  AzureStorageService,
-  StorageUploadResult
+  UploadBlob,
+  GetBlob
 } from './azure-storage';
 
 export {
-  AzureStorageEnhanced
+  AzureStorageService as AzureStorageEnhanced,
+  azureStorageService
 } from './azure-storage-enhanced';
 
 // Validation Services
 export { 
   validateChatInput, 
   sanitizeInput,
-  ValidationOptions,
-  ValidationResult
+  validateChatMessage,
+  validateDocumentUpload
 } from './validation-service';
 
 // Cosmos DB Optimized Service
 export {
-  CosmosOptimized
+  OptimizedCosmosService as CosmosOptimized,
+  optimizedCosmosService
 } from './cosmos-optimized';
 
 export {

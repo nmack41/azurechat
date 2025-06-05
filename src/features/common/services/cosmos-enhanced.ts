@@ -3,8 +3,8 @@
 
 import { CosmosClient, Container } from "@azure/cosmos";
 import { DefaultAzureCredential } from "@azure/identity";
-import { performanceMonitor } from "@/features/common/observability/performance-monitor";
-import { logger } from "@/features/common/observability/logger";
+import { performanceMonitor } from "@/observability/performance-monitor";
+import { logger } from "@/observability/logger";
 
 // Configure Cosmos DB details
 const DB_NAME = process.env.AZURE_COSMOSDB_DB_NAME || "chat";

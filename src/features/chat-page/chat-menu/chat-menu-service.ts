@@ -4,7 +4,7 @@ import {
   RedirectToPage,
   RevalidateCache,
 } from "@/features/common/navigation-helpers";
-import { ServerActionResponse } from "@/features/common/server-action-response";
+import { ServerActionResponse } from "@/utils/server-action-response";
 import {
   FindAllChatThreadForCurrentUser,
   SoftDeleteChatThreadForCurrentUser,

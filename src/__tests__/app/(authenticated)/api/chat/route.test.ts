@@ -1,5 +1,5 @@
 import { POST } from '@/app/(authenticated)/api/chat/route'
-import { validateChatMessage } from '@/features/common/services/validation-service'
+import { validateChatMessage } from '@/services/validation-service'
 import { ChatAPIEntry } from '@/features/chat-page/chat-services/chat-api/chat-api'
 
 // Mock dependencies

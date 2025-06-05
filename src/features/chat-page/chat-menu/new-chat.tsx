@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@/features/ui/button";
-import { LoadingIndicator } from "@/features/ui/loading";
+import { Button } from "@/ui/button";
+import { LoadingIndicator } from "@/ui/loading";
 import { Plus } from "lucide-react";
 import { useFormStatus } from "react-dom";
 

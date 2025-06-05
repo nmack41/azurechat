@@ -1,12 +1,12 @@
 "use client";
-import { RedirectToPage } from "@/features/common/navigation-helpers";
+import { RedirectToPage } from "@/utils/navigation-helpers";
 import { showError } from "@/features/globals/global-message-store";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/features/ui/dropdown-menu";
-import { LoadingIndicator } from "@/features/ui/loading";
+import { LoadingIndicator } from "@/ui/loading";
 import { MoreVertical, Trash } from "lucide-react";
 import { useState } from "react";
 import { DropdownMenuItemWithIcon } from "./chat-menu-item";

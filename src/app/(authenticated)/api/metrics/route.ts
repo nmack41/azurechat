@@ -2,9 +2,9 @@
 // ABOUTME: Provides comprehensive application metrics in Prometheus format
 
 import { NextRequest, NextResponse } from "next/server";
-import { performanceMonitor } from "@/features/common/observability/performance-monitor";
-import { connectionPoolManager } from "@/features/common/services/connection-pool-manager";
-import { streamingQueryService } from "@/features/common/services/streaming-query-service";
+import { performanceMonitor } from "@/observability/performance-monitor";
+import { connectionPoolManager } from "@/services/connection-pool-manager";
+import { streamingQueryService } from "@/services/streaming-query-service";
 
 interface MetricValue {
   name: string;

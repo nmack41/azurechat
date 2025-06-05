@@ -1,8 +1,8 @@
 import "server-only";
 
-import { ServerActionResponse } from "@/features/common/server-action-response";
+import { ServerActionResponse } from "@/utils/server-action-response";
 import { GetBlob, UploadBlob } from "../../common/services/azure-storage";
-import { sanitizeInput } from "@/features/common/services/validation-service";
+import { sanitizeInput } from "@/services/validation-service";
 
 const IMAGE_CONTAINER_NAME = "images";
 const IMAGE_API_PATH = process.env.NEXTAUTH_URL + "/api/images";

@@ -2,7 +2,7 @@
 // ABOUTME: Validates chat interface error catching, recovery options, and user experience
 
 import { render, screen, fireEvent } from '@testing-library/react';
-import { ChatErrorBoundary, withChatErrorBoundary, useErrorHandler } from '@/features/ui/error-boundary/chat-error-boundary';
+import { ChatErrorBoundary, withChatErrorBoundary, useErrorHandler } from '@/ui/error-boundary/chat-error-boundary';
 
 // Mock window.location
 const mockReload = jest.fn();

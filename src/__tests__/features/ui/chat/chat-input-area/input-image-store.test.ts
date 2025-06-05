@@ -1,4 +1,4 @@
-import { InputImageStore, useInputImage } from '@/features/ui/chat/chat-input-area/input-image-store'
+import { InputImageStore, useInputImage } from '@/ui/chat/chat-input-area/input-image-store'
 import { renderHook, act } from '@testing-library/react'
 
 // Mock URL.createObjectURL

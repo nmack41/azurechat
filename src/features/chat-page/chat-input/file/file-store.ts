@@ -1,6 +1,6 @@
 "use client";
 
-import { ServerActionResponse } from "@/features/common/server-action-response";
+import { ServerActionResponse } from "@/utils/server-action-response";
 import {
   showError,
   showSuccess,

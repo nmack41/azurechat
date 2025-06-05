@@ -1,7 +1,7 @@
 "use server";
 import "server-only";
 
-import { ServerActionResponse } from "@/features/common/server-action-response";
+import { ServerActionResponse } from "@/utils/server-action-response";
 
 import { userHashedId } from "@/features/auth-page/helpers";
 import {

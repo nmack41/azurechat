@@ -3,7 +3,7 @@
 import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { ChatTextInput } from '@/features/ui/chat/chat-input-area/chat-text-input'
+import { ChatTextInput } from '@/ui/chat/chat-input-area/chat-text-input'
 
 describe('ChatTextInput', () => {
   describe('Basic Rendering', () => {

@@ -1,7 +1,7 @@
 "use client";
 
-import { RedirectToChatThread } from "@/features/common/navigation-helpers";
-import { LoadingIndicator } from "@/features/ui/loading";
+import { RedirectToChatThread } from "@/utils/navigation-helpers";
+import { LoadingIndicator } from "@/ui/loading";
 import { MessageCircle } from "lucide-react";
 import { FC, useState } from "react";
 import { Button } from "../../ui/button";

@@ -1,9 +1,9 @@
 "use server";
 import "server-only";
 
-import { ServerActionResponse } from "@/features/common/server-action-response";
-import { OpenAIDALLEInstance } from "@/features/common/services/openai";
-import { uniqueId } from "@/features/common/util";
+import { ServerActionResponse } from "@/utils/server-action-response";
+import { OpenAIDALLEInstance } from "@/services/openai";
+import { uniqueId } from "@/utils/util";
 import { GetImageUrl, UploadImageToStore } from "../chat-image-service";
 import { ChatThreadModel } from "../models";
 

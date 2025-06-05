@@ -1,6 +1,6 @@
 import ReportingChatPage from "@/features/reporting-page/reporting-chat-page";
 import { FindAllChatMessagesForAdmin } from "@/features/reporting-page/reporting-services/reporting-service";
-import { DisplayError } from "@/features/ui/error/display-error";
+import { DisplayError } from "@/ui/error/display-error";
 
 interface HomeParams {
   params: {

@@ -1,8 +1,8 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/features/ui/card";
-import { LoadingIndicator } from "@/features/ui/loading";
-import { ScrollArea } from "@/features/ui/scroll-area";
+import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
+import { LoadingIndicator } from "@/ui/loading";
+import { ScrollArea } from "@/ui/scroll-area";
 import { Button } from "@/ui/button";
 import {
   Sheet,

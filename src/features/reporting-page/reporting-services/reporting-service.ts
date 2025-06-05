@@ -1,13 +1,13 @@
 import { getCurrentUser } from "@/features/auth-page/helpers";
-import { sanitizeInput } from "@/features/common/services/validation-service";
+import { sanitizeInput } from "@/services/validation-service";
 import {
   CHAT_THREAD_ATTRIBUTE,
   ChatMessageModel,
   ChatThreadModel,
   MESSAGE_ATTRIBUTE,
 } from "@/features/chat-page/chat-services/models";
-import { ServerActionResponse } from "@/features/common/server-action-response";
-import { HistoryContainer } from "@/features/common/services/cosmos";
+import { ServerActionResponse } from "@/utils/server-action-response";
+import { HistoryContainer } from "@/services/cosmos";
 import { SqlQuerySpec } from "@azure/cosmos";
 
 export const FindAllChatThreadsForAdmin = async (

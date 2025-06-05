@@ -1,6 +1,6 @@
 import { ExtensionPage } from "@/features/extensions-page/extension-page";
 import { FindAllExtensionForCurrentUser } from "@/features/extensions-page/extension-services/extension-service";
-import { DisplayError } from "@/features/ui/error/display-error";
+import { DisplayError } from "@/ui/error/display-error";
 
 export default async function Home() {
   const extensionResponse = await FindAllExtensionForCurrentUser();

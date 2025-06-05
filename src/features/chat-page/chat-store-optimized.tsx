@@ -2,7 +2,7 @@
 // ABOUTME: Reduces unnecessary re-renders and optimizes state updates
 
 "use client";
-import { uniqueId } from "@/features/common/util";
+import { uniqueId } from "@/utils/util";
 import { showError } from "@/features/globals/global-message-store";
 import { AI_NAME, NEW_CHAT_NAME } from "@/features/theme/theme-config";
 import {

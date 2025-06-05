@@ -1,5 +1,5 @@
 import { SearchAzureAISimilarDocuments } from "@/features/chat-page/chat-services/chat-api/chat-api-rag-extension";
-import { validateChatMessage } from "@/features/common/services/validation-service";
+import { validateChatMessage } from "@/services/validation-service";
 
 export async function POST(req: Request) {
   try {

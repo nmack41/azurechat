@@ -5,7 +5,7 @@ import {
   addCorrelationHeaders, 
   logRequest 
 } from "@/features/common/observability/correlation-middleware";
-import { securityAudit } from "@/features/common/observability/security-audit";
+import { securityAudit } from "@/observability/security-audit";
 
 const requireAuth: string[] = [
   "/chat",

@@ -1,4 +1,4 @@
-import { Button } from "@/features/ui/button";
+import { Button } from "@/ui/button";
 import { FC, PropsWithChildren } from "react";
 
 interface HeroProps extends PropsWithChildren {

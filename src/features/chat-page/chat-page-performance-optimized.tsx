@@ -5,10 +5,10 @@
 
 import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { useSnapshot } from "valtio";
-import { ChatMessageArea } from "@/features/ui/chat/chat-message-area/chat-message-area";
-import { ChatInputArea } from "@/features/ui/chat/chat-input-area/chat-input-area";
+import { ChatMessageArea } from "@/ui/chat/chat-message-area/chat-message-area";
+import { ChatInputArea } from "@/ui/chat/chat-input-area/chat-input-area";
 import { ChatHeader } from "./chat-header/chat-header";
-import { useVirtualList, useDebounce, useIntersectionObserver } from "@/features/common/performance-utils";
+import { useVirtualList, useDebounce, useIntersectionObserver } from "@/utils/performance-utils";
 import { chatStore } from "./chat-store-optimized";
 import { 
   chatIntegration, 

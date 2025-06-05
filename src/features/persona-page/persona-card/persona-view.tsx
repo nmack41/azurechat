@@ -1,5 +1,5 @@
-import { ScrollArea } from "@/features/ui/scroll-area";
-import { Textarea } from "@/features/ui/textarea";
+import { ScrollArea } from "@/ui/scroll-area";
+import { Textarea } from "@/ui/textarea";
 import { Info } from "lucide-react";
 import { FC } from "react";
 import { Button } from "../../ui/button";

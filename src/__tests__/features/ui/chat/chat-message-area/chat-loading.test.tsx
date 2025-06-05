@@ -2,7 +2,7 @@
 // ABOUTME: Tests loading indicator display and styling in chat context
 import React from 'react'
 import { render, screen } from '@testing-library/react'
-import { ChatLoading } from '@/features/ui/chat/chat-message-area/chat-loading'
+import { ChatLoading } from '@/ui/chat/chat-message-area/chat-loading'
 
 // Mock the LoadingIndicator component
 jest.mock('@/features/ui/loading', () => ({

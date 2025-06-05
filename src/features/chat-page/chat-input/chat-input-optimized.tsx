@@ -12,18 +12,18 @@ import {
   useChatInputDynamicHeight,
 } from "@/features/chat-page/chat-input/use-chat-input-dynamic-height";
 
-import { AttachFile } from "@/features/ui/chat/chat-input-area/attach-file";
+import { AttachFile } from "@/ui/chat/chat-input-area/attach-file";
 import {
   ChatInputActionArea,
   ChatInputForm,
   ChatInputPrimaryActionArea,
   ChatInputSecondaryActionArea,
 } from "@/features/ui/chat/chat-input-area/chat-input-area";
-import { ChatTextInput } from "@/features/ui/chat/chat-input-area/chat-text-input";
-import { ImageInput } from "@/features/ui/chat/chat-input-area/image-input";
-import { Microphone } from "@/features/ui/chat/chat-input-area/microphone";
-import { StopChat } from "@/features/ui/chat/chat-input-area/stop-chat";
-import { SubmitChat } from "@/features/ui/chat/chat-input-area/submit-chat";
+import { ChatTextInput } from "@/ui/chat/chat-input-area/chat-text-input";
+import { ImageInput } from "@/ui/chat/chat-input-area/image-input";
+import { Microphone } from "@/ui/chat/chat-input-area/microphone";
+import { StopChat } from "@/ui/chat/chat-input-area/stop-chat";
+import { SubmitChat } from "@/ui/chat/chat-input-area/submit-chat";
 import { chatStore, useChat } from "../chat-store";
 import { fileStore, useFileStore } from "./file/file-store";
 import { PromptSlider } from "./prompt/prompt-slider";

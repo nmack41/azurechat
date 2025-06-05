@@ -5,9 +5,9 @@
 
 import React from 'react';
 import { BaseErrorBoundary } from './base-error-boundary';
-import { ErrorReferenceService } from '@/features/common/errors/error-reference';
-import { appInsights } from '@/features/common/observability/app-insights';
-import { securityAudit } from '@/features/common/observability/security-audit';
+import { ErrorReferenceService } from '@/errors/error-reference';
+import { appInsights } from '@/observability/app-insights';
+import { securityAudit } from '@/observability/security-audit';
 
 /**
  * Application-level error boundary for catastrophic failures

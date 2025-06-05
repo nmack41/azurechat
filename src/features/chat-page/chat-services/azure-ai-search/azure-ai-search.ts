@@ -2,13 +2,13 @@
 import "server-only";
 
 import { userHashedId } from "@/features/auth-page/helpers";
-import { ServerActionResponse } from "@/features/common/server-action-response";
+import { ServerActionResponse } from "@/utils/server-action-response";
 import {
   AzureAISearchIndexClientInstance,
   AzureAISearchInstance,
 } from "@/features/common/services/ai-search";
-import { OpenAIEmbeddingInstance } from "@/features/common/services/openai";
-import { uniqueId } from "@/features/common/util";
+import { OpenAIEmbeddingInstance } from "@/services/openai";
+import { uniqueId } from "@/utils/util";
 import {
   AzureKeyCredential,
   SearchClient,

@@ -2,8 +2,8 @@
 // ABOUTME: Checks if application is ready to receive traffic
 
 import { NextRequest, NextResponse } from 'next/server';
-import { healthService } from '@/features/common/observability/health-service';
-import { ErrorSerializer } from '@/features/common/errors';
+import { healthService } from '@/observability/health-service';
+import { ErrorSerializer } from '@/errors';
 
 /**
  * GET /api/ready - Readiness probe for Kubernetes

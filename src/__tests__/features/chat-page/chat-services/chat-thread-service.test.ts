@@ -10,9 +10,9 @@ import {
 } from '@/features/chat-page/chat-services/chat-thread-service';
 
 // These dependencies are already mocked globally in jest.setup.js, so we just import them for type safety
-import { CosmosDBContainer } from '@/features/common/services/cosmos';
+import { CosmosDBContainer } from '@/services/cosmos';
 import { userHashedId } from '@/features/auth-page/helpers';
-import { sanitizeInput } from '@/features/common/services/validation-service';
+import { sanitizeInput } from '@/services/validation-service';
 
 const mockCosmosDBContainer = CosmosDBContainer as jest.MockedFunction<typeof CosmosDBContainer>;
 const mockUserHashedId = userHashedId as jest.MockedFunction<typeof userHashedId>;

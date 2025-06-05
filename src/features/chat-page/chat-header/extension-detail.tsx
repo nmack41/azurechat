@@ -1,6 +1,6 @@
 import { ExtensionModel } from "@/features/extensions-page/extension-services/models";
-import { Button } from "@/features/ui/button";
-import { ScrollArea } from "@/features/ui/scroll-area";
+import { Button } from "@/ui/button";
+import { ScrollArea } from "@/ui/scroll-area";
 import {
   Sheet,
   SheetContent,
@@ -8,7 +8,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/features/ui/sheet";
-import { Switch } from "@/features/ui/switch";
+import { Switch } from "@/ui/switch";
 import { PocketKnife } from "lucide-react";
 import { FC } from "react";
 import { chatStore } from "../chat-store";

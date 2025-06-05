@@ -6,10 +6,10 @@ import {
   userHashedId,
   userSession,
 } from "@/features/auth-page/helpers";
-import { sanitizeInput } from "@/features/common/services/validation-service";
-import { RedirectToChatThread } from "@/features/common/navigation-helpers";
-import { ServerActionResponse } from "@/features/common/server-action-response";
-import { uniqueId } from "@/features/common/util";
+import { sanitizeInput } from "@/services/validation-service";
+import { RedirectToChatThread } from "@/utils/navigation-helpers";
+import { ServerActionResponse } from "@/utils/server-action-response";
+import { uniqueId } from "@/utils/util";
 import {
   CHAT_DEFAULT_PERSONA,
   NEW_CHAT_NAME,

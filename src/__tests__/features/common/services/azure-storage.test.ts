@@ -1,4 +1,4 @@
-import { UploadBlob, GetBlob } from '@/features/common/services/azure-storage'
+import { UploadBlob, GetBlob } from '@/services/azure-storage'
 import { BlobServiceClient, RestError } from '@azure/storage-blob'
 import { DefaultAzureCredential } from '@azure/identity'
 

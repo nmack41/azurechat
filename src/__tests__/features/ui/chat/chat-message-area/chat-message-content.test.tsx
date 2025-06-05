@@ -2,7 +2,7 @@
 // ABOUTME: Tests message content area rendering, ref forwarding, and layout
 import React from 'react'
 import { render, screen } from '@testing-library/react'
-import ChatMessageContentArea from '@/features/ui/chat/chat-message-area/chat-message-content'
+import ChatMessageContentArea from '@/ui/chat/chat-message-area/chat-message-content'
 
 describe('ChatMessageContentArea', () => {
   describe('Basic Rendering', () => {

@@ -4,7 +4,7 @@ import { FindAllChatMessagesForCurrentUser } from "@/features/chat-page/chat-ser
 import { FindChatThreadForCurrentUser } from "@/features/chat-page/chat-services/chat-thread-service";
 import { FindAllExtensionForCurrentUser } from "@/features/extensions-page/extension-services/extension-service";
 import { AI_NAME } from "@/features/theme/theme-config";
-import { DisplayError } from "@/features/ui/error/display-error";
+import { DisplayError } from "@/ui/error/display-error";
 
 export const metadata = {
   title: AI_NAME,

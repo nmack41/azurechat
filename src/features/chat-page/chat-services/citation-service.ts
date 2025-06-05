@@ -1,7 +1,7 @@
 import { userHashedId } from "@/features/auth-page/helpers";
-import { ServerActionResponse } from "@/features/common/server-action-response";
-import { HistoryContainer } from "@/features/common/services/cosmos";
-import { uniqueId } from "@/features/common/util";
+import { ServerActionResponse } from "@/utils/server-action-response";
+import { HistoryContainer } from "@/services/cosmos";
+import { uniqueId } from "@/utils/util";
 import { SqlQuerySpec } from "@azure/cosmos";
 import { DocumentSearchResponse } from "./azure-ai-search/azure-ai-search";
 import { CHAT_CITATION_ATTRIBUTE, ChatCitationModel } from "./models";

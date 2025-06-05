@@ -86,13 +86,9 @@ export {
   ChatLoading
 } from './chat/chat-message-area/chat-loading';
 
-export {
-  ChatMessageContainer
-} from './chat/chat-message-area/chat-message-container';
+export { default as ChatMessageContainer } from './chat/chat-message-area/chat-message-container';
 
-export {
-  ChatMessageContent
-} from './chat/chat-message-area/chat-message-content';
+export { default as ChatMessageContent } from './chat/chat-message-area/chat-message-content';
 
 export {
   useChatScrollAnchor

@@ -1,6 +1,6 @@
 import { ExtensionSimilaritySearch } from "../azure-ai-search/azure-ai-search";
 import { CreateCitations, FormatCitations } from "../citation-service";
-import { validateChatMessage, sanitizeInput } from "@/features/common/services/validation-service";
+import { validateChatMessage, sanitizeInput } from "@/services/validation-service";
 
 export const SearchAzureAISimilarDocuments = async (req: Request) => {
   try {

@@ -1,8 +1,8 @@
 "use client";
 
 import { DropdownMenuItemWithIcon } from "@/features/chat-page/chat-menu/chat-menu-item";
-import { RevalidateCache } from "@/features/common/navigation-helpers";
-import { LoadingIndicator } from "@/features/ui/loading";
+import { RevalidateCache } from "@/utils/navigation-helpers";
+import { LoadingIndicator } from "@/ui/loading";
 import { MoreVertical, Pencil, Trash } from "lucide-react";
 import { FC, useState } from "react";
 import {

@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/features/ui/button";
+import { Button } from "@/ui/button";
 import { Pencil } from "lucide-react";
 import { FC } from "react";
 import {

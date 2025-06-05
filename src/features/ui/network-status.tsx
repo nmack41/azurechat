@@ -4,8 +4,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useNetworkStatus } from "@/features/common/observability/offline-detection";
-import { Badge } from "@/features/ui/badge";
+import { useNetworkStatus } from "@/observability/offline-detection";
+import { Badge } from "@/ui/badge";
 
 interface NetworkStatusProps {
   showQuality?: boolean;

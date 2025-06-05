@@ -2,7 +2,7 @@ import {
   GetImageFromStore,
   GetThreadAndImageFromUrl,
 } from "./chat-image-service";
-import { sanitizeInput } from "@/features/common/services/validation-service";
+import { sanitizeInput } from "@/services/validation-service";
 
 export const ImageAPIEntry = async (request: Request): Promise<Response> => {
   try {

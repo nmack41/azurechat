@@ -1,5 +1,5 @@
 "use client";
-import { Hero } from "@/features/ui/hero";
+import { Hero } from "@/ui/hero";
 import { Sheet } from "lucide-react";
 
 export const ReportingHero = () => {

@@ -1,5 +1,5 @@
 "use client";
-import { Hero, HeroButton } from "@/features/ui/hero";
+import { Hero, HeroButton } from "@/ui/hero";
 import { Book, BookImage, NotebookPen } from "lucide-react";
 import { promptStore } from "../prompt-store";
 

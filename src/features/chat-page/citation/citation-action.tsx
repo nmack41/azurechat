@@ -1,7 +1,7 @@
 "use server";
 
-import { DisplayError } from "@/features/ui/error/display-error";
-import { RecursiveUI } from "@/features/ui/recursive-ui";
+import { DisplayError } from "@/ui/error/display-error";
+import { RecursiveUI } from "@/ui/recursive-ui";
 import { FindCitationByID } from "../chat-services/citation-service";
 
 export const CitationAction = async (

@@ -1,4 +1,4 @@
-import { HeroButton } from "@/features/ui/hero";
+import { HeroButton } from "@/ui/hero";
 import { PocketKnife } from "lucide-react";
 import { extensionStore } from "../extension-store";
 

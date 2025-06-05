@@ -2,10 +2,10 @@
 // ABOUTME: Processes client-side telemetry for real-time monitoring and analytics
 
 import { NextRequest, NextResponse } from "next/server";
-import { logger } from "@/features/common/observability/logger";
-import { appInsights } from "@/features/common/observability/app-insights";
-import { performanceMonitor } from "@/features/common/observability/performance-monitor";
-import { securityAudit } from "@/features/common/observability/security-audit";
+import { logger } from "@/observability/logger";
+import { appInsights } from "@/observability/app-insights";
+import { performanceMonitor } from "@/observability/performance-monitor";
+import { securityAudit } from "@/observability/security-audit";
 
 interface ClientMetric {
   type: 'performance' | 'error' | 'navigation' | 'interaction';

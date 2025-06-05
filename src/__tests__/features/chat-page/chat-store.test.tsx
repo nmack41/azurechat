@@ -1,6 +1,6 @@
 import { chatStore, useChat } from '@/features/chat-page/chat-store'
 import { ChatMessageModel, ChatThreadModel } from '@/features/chat-page/chat-services/models'
-import { uniqueId } from '@/features/common/util'
+import { uniqueId } from '@/utils/util'
 import { renderHook, act } from '@testing-library/react'
 
 // Mock dependencies

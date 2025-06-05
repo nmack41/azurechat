@@ -1,4 +1,4 @@
-import { CosmosInstance, ConfigContainer, HistoryContainer } from '@/features/common/services/cosmos'
+import { CosmosInstance, ConfigContainer, HistoryContainer } from '@/services/cosmos'
 import { CosmosClient } from '@azure/cosmos'
 import { DefaultAzureCredential } from '@azure/identity'
 

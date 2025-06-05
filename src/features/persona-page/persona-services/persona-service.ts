@@ -2,7 +2,7 @@
 import "server-only";
 
 import { getCurrentUser, userHashedId } from "@/features/auth-page/helpers";
-import { sanitizeInput } from "@/features/common/services/validation-service";
+import { sanitizeInput } from "@/services/validation-service";
 import { UpsertChatThread } from "@/features/chat-page/chat-services/chat-thread-service";
 import {
   CHAT_THREAD_ATTRIBUTE,
@@ -12,8 +12,8 @@ import {
   ServerActionResponse,
   zodErrorsToServerActionErrors,
 } from "@/features/common/server-action-response";
-import { HistoryContainer } from "@/features/common/services/cosmos";
-import { uniqueId } from "@/features/common/util";
+import { HistoryContainer } from "@/services/cosmos";
+import { uniqueId } from "@/utils/util";
 import { SqlQuerySpec } from "@azure/cosmos";
 import { PERSONA_ATTRIBUTE, PersonaModel, PersonaModelSchema } from "./models";
 

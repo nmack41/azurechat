@@ -1,8 +1,8 @@
-import { Alert, AlertDescription, AlertTitle } from "@/features/ui/alert";
-import { Button } from "@/features/ui/button";
-import { Input } from "@/features/ui/input";
-import { Label } from "@/features/ui/label";
-import { SheetTitle } from "@/features/ui/sheet";
+import { Alert, AlertDescription, AlertTitle } from "@/ui/alert";
+import { Button } from "@/ui/button";
+import { Input } from "@/ui/input";
+import { Label } from "@/ui/label";
+import { SheetTitle } from "@/ui/sheet";
 import { KeyRound, Plus, Trash } from "lucide-react";
 import { FC } from "react";
 import { HeaderModel } from "../extension-services/models";

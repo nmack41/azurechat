@@ -2,13 +2,13 @@
 import "server-only";
 
 import { userHashedId } from "@/features/auth-page/helpers";
-import { HistoryContainer } from "@/features/common/services/cosmos";
+import { HistoryContainer } from "@/services/cosmos";
 
-import { RevalidateCache } from "@/features/common/navigation-helpers";
-import { ServerActionResponse } from "@/features/common/server-action-response";
-import { DocumentIntelligenceInstance } from "@/features/common/services/document-intelligence";
-import { uniqueId } from "@/features/common/util";
-import { validateDocumentUpload } from "@/features/common/services/validation-service";
+import { RevalidateCache } from "@/utils/navigation-helpers";
+import { ServerActionResponse } from "@/utils/server-action-response";
+import { DocumentIntelligenceInstance } from "@/services/document-intelligence";
+import { uniqueId } from "@/utils/util";
+import { validateDocumentUpload } from "@/services/validation-service";
 import { SqlQuerySpec } from "@azure/cosmos";
 import { EnsureIndexIsCreated } from "./azure-ai-search/azure-ai-search";
 import { CHAT_DOCUMENT_ATTRIBUTE, ChatDocumentModel } from "./models";

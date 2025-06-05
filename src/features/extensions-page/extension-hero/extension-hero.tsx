@@ -1,7 +1,7 @@
 "use client";
 
 import { AI_NAME } from "@/features/theme/theme-config";
-import { Hero } from "@/features/ui/hero";
+import { Hero } from "@/ui/hero";
 import { PocketKnife } from "lucide-react";
 import { AISearch } from "./ai-search-issues";
 import { BingSearch } from "./bing-search";

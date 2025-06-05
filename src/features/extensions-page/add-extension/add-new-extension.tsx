@@ -1,8 +1,8 @@
 "use client";
 
-import { ServerActionResponse } from "@/features/common/server-action-response";
-import { LoadingIndicator } from "@/features/ui/loading";
-import { Textarea } from "@/features/ui/textarea";
+import { ServerActionResponse } from "@/utils/server-action-response";
+import { LoadingIndicator } from "@/ui/loading";
+import { Textarea } from "@/ui/textarea";
 import { useSession } from "next-auth/react";
 import { FC } from "react";
 import { useFormState } from "react-dom";

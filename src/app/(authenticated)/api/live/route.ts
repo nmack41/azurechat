@@ -2,8 +2,8 @@
 // ABOUTME: Simple check to verify application is running
 
 import { NextRequest, NextResponse } from 'next/server';
-import { healthService } from '@/features/common/observability/health-service';
-import { ErrorSerializer } from '@/features/common/errors';
+import { healthService } from '@/observability/health-service';
+import { ErrorSerializer } from '@/errors';
 
 /**
  * GET /api/live - Liveness probe for Kubernetes

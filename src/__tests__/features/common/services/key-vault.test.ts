@@ -1,4 +1,4 @@
-import { AzureKeyVaultInstance } from '@/features/common/services/key-vault'
+import { AzureKeyVaultInstance } from '@/services/key-vault'
 import { DefaultAzureCredential } from '@azure/identity'
 import { SecretClient } from '@azure/keyvault-secrets'
 

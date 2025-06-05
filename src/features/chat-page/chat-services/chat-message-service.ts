@@ -2,9 +2,9 @@
 import "server-only";
 
 import { userHashedId } from "@/features/auth-page/helpers";
-import { ServerActionResponse } from "@/features/common/server-action-response";
-import { uniqueId } from "@/features/common/util";
-import { validateChatInput } from "@/features/common/services/validation-service";
+import { ServerActionResponse } from "@/utils/server-action-response";
+import { uniqueId } from "@/utils/util";
+import { validateChatInput } from "@/services/validation-service";
 import { SqlQuerySpec } from "@azure/cosmos";
 import { HistoryContainer } from "../../common/services/cosmos";
 import { ChatMessageModel, ChatRole, MESSAGE_ATTRIBUTE } from "./models";

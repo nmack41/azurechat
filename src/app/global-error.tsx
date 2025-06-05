@@ -4,13 +4,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { Button } from "@/features/ui/button";
-import { Card } from "@/features/ui/card";
-import { Badge } from "@/features/ui/badge";
-import { appInsights } from "@/features/common/observability/app-insights";
-import { logger } from "@/features/common/observability/logger";
-import { securityAudit } from "@/features/common/observability/security-audit";
-import { ErrorReferenceService } from "@/features/common/errors/error-reference";
+import { Button } from "@/ui/button";
+import { Card } from "@/ui/card";
+import { Badge } from "@/ui/badge";
+import { appInsights } from "@/observability/app-insights";
+import { logger } from "@/observability/logger";
+import { securityAudit } from "@/observability/security-audit";
+import { ErrorReferenceService } from "@/errors/error-reference";
 
 interface GlobalErrorProps {
   error: Error & { digest?: string };

@@ -12,9 +12,9 @@ import {
   convertFromDBModel,
   convertToDBModel,
 } from '@/features/extensions-page/extension-services/extension-service';
-import { CosmosDBContainer } from '@/features/common/services/cosmos';
+import { CosmosDBContainer } from '@/services/cosmos';
 import { userHashedId } from '@/features/auth-page/helpers';
-import { sanitizeInput } from '@/features/common/services/validation-service';
+import { sanitizeInput } from '@/services/validation-service';
 
 // Mock dependencies
 jest.mock('@/features/common/services/cosmos');

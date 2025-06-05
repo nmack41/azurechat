@@ -1,6 +1,6 @@
 import { CosmosClient } from "@azure/cosmos";
 import { DefaultAzureCredential } from "@azure/identity";
-import { performanceMonitor } from "@/features/common/observability/performance-monitor";
+import { performanceMonitor } from "@/observability/performance-monitor";
 import { OptimizedCosmosOperations } from "./cosmos-enhanced";
 
 // Configure Cosmos DB details

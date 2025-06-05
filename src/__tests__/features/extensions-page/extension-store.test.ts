@@ -6,7 +6,7 @@ import {
   exampleFunction,
 } from '@/features/extensions-page/extension-store'
 import { ExtensionFunctionModel, ExtensionModel } from '@/features/extensions-page/extension-services/models'
-import { uniqueId } from '@/features/common/util'
+import { uniqueId } from '@/utils/util'
 import { renderHook, act } from '@testing-library/react'
 
 // Mock dependencies

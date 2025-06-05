@@ -3,8 +3,8 @@
 
 "use client";
 
-import { ServerActionResponse } from "@/features/common/server-action-response";
-import { LRUCache, memoizeWithLRU } from "@/features/common/performance-utils";
+import { ServerActionResponse } from "@/utils/server-action-response";
+import { LRUCache, memoizeWithLRU } from "@/utils/performance-utils";
 import { ChatMessageModel, ChatThreadModel } from "./models";
 
 // Import optimized services

@@ -1,7 +1,7 @@
 import { CHAT_DEFAULT_SYSTEM_PROMPT } from "@/features/theme/theme-config";
-import { Button } from "@/features/ui/button";
-import { Label } from "@/features/ui/label";
-import { ScrollArea } from "@/features/ui/scroll-area";
+import { Button } from "@/ui/button";
+import { Label } from "@/ui/label";
+import { ScrollArea } from "@/ui/scroll-area";
 import {
   Sheet,
   SheetContent,

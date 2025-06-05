@@ -2,7 +2,7 @@
 import "server-only";
 
 import { userHashedId } from "@/features/auth-page/helpers";
-import { OpenAIInstance } from "@/features/common/services/openai";
+import { OpenAIInstance } from "@/services/openai";
 import {
   ChatCompletionStreamingRunner,
   ChatCompletionStreamParams,

@@ -5,7 +5,7 @@
 import "server-only";
 
 import { userHashedId } from "@/features/auth-page/helpers";
-import { ServerActionResponse } from "@/features/common/server-action-response";
+import { ServerActionResponse } from "@/utils/server-action-response";
 import { SqlQuerySpec } from "@azure/cosmos";
 import { 
   optimizedCosmosService, 

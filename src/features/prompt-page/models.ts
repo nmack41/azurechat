@@ -1,4 +1,4 @@
-import { refineFromEmpty } from "@/features/common/schema-validation";
+import { refineFromEmpty } from "@/utils/schema-validation";
 import { z } from "zod";
 
 export const PROMPT_ATTRIBUTE = "PROMPT";

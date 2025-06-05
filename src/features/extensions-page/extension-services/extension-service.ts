@@ -6,7 +6,7 @@ import {
   userHashedId,
   userSession,
 } from "@/features/auth-page/helpers";
-import { sanitizeInput } from "@/features/common/services/validation-service";
+import { sanitizeInput } from "@/services/validation-service";
 import { UpsertChatThread } from "@/features/chat-page/chat-services/chat-thread-service";
 import {
   CHAT_THREAD_ATTRIBUTE,
@@ -16,9 +16,9 @@ import {
   ServerActionResponse,
   zodErrorsToServerActionErrors,
 } from "@/features/common/server-action-response";
-import { HistoryContainer } from "@/features/common/services/cosmos";
-import { AzureKeyVaultInstance } from "@/features/common/services/key-vault";
-import { uniqueId } from "@/features/common/util";
+import { HistoryContainer } from "@/services/cosmos";
+import { AzureKeyVaultInstance } from "@/services/key-vault";
+import { uniqueId } from "@/utils/util";
 import { AI_NAME, CHAT_DEFAULT_PERSONA } from "@/features/theme/theme-config";
 import { SqlQuerySpec } from "@azure/cosmos";
 import {

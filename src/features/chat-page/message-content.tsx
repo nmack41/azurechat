@@ -1,4 +1,4 @@
-import { Markdown } from "@/features/ui/markdown/markdown";
+import { Markdown } from "@/ui/markdown/markdown";
 import { FunctionSquare } from "lucide-react";
 import React from "react";
 import {

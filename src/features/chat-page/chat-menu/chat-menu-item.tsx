@@ -6,7 +6,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/features/ui/dropdown-menu";
-import { LoadingIndicator } from "@/features/ui/loading";
+import { LoadingIndicator } from "@/ui/loading";
 import { cn } from "@/ui/lib";
 import { BookmarkCheck, MoreVertical, Pencil, Trash } from "lucide-react";
 import Link from "next/link";

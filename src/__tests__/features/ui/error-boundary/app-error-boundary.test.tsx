@@ -2,7 +2,7 @@
 // ABOUTME: Validates error catching, fallback UI, and recovery actions
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { AppErrorBoundary } from '@/features/ui/error-boundary/app-error-boundary';
+import { AppErrorBoundary } from '@/ui/error-boundary/app-error-boundary';
 
 // Mock clipboard API
 Object.assign(navigator, {
