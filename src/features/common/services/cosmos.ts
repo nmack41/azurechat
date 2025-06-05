@@ -1,6 +1,7 @@
 import { CosmosClient } from "@azure/cosmos";
 import { DefaultAzureCredential } from "@azure/identity";
 import { performanceMonitor } from "@/features/common/observability/performance-monitor";
+import { OptimizedCosmosOperations } from "./cosmos-enhanced";
 
 // Configure Cosmos DB details
 const DB_NAME = process.env.AZURE_COSMOSDB_DB_NAME || "chat";
@@ -50,104 +51,39 @@ export const HistoryContainer = () => {
   return container;
 };
 
-// Enhanced cosmos operations with performance monitoring
+// Enhanced cosmos operations with performance monitoring (legacy compatibility)
 export const CosmosOperations = {
   /**
-   * Monitored query operation
+   * Monitored query operation - delegates to optimized version
    */
   async query<T>(container: any, querySpec: any, options?: any): Promise<T[]> {
-    const measurement = performanceMonitor.startMeasurement('cosmos_query', {
-      container: container.id || 'unknown',
-      query: querySpec.query || 'unknown',
-    });
-
-    try {
-      const { resources } = await container.items.query<T>(querySpec, options).fetchAll();
-      
-      measurement.finish(true, {
-        resultCount: resources.length,
-        cached: false,
-      });
-      
-      return resources;
-    } catch (error) {
-      measurement.finish(false, {
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
-      throw error;
-    }
+    const result = await OptimizedCosmosOperations.query<T>(container, querySpec, options);
+    return result.resources;
   },
 
   /**
-   * Monitored upsert operation
+   * Monitored upsert operation - delegates to optimized version
    */
   async upsert<T>(container: any, item: T): Promise<T> {
-    const measurement = performanceMonitor.startMeasurement('cosmos_upsert', {
-      container: container.id || 'unknown',
-    });
-
-    try {
-      const { resource } = await container.items.upsert(item);
-      
-      measurement.finish(true, {
-        cached: false,
-      });
-      
-      return resource;
-    } catch (error) {
-      measurement.finish(false, {
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
-      throw error;
-    }
+    const result = await OptimizedCosmosOperations.upsert<T>(container, item);
+    return result.resource;
   },
 
   /**
-   * Monitored read operation
+   * Monitored read operation - delegates to optimized version
    */
   async read<T>(container: any, id: string, partitionKey?: string): Promise<T | null> {
-    const measurement = performanceMonitor.startMeasurement('cosmos_read', {
-      container: container.id || 'unknown',
-      hasPartitionKey: !!partitionKey,
-    });
-
-    try {
-      const { resource } = await container.item(id, partitionKey).read<T>();
-      
-      measurement.finish(true, {
-        resultCount: resource ? 1 : 0,
-        cached: false,
-      });
-      
-      return resource || null;
-    } catch (error) {
-      measurement.finish(false, {
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
-      throw error;
-    }
+    const result = await OptimizedCosmosOperations.read<T>(container, id, partitionKey);
+    return result.resource || null;
   },
 
   /**
-   * Monitored delete operation
+   * Monitored delete operation - delegates to optimized version
    */
   async delete(container: any, id: string, partitionKey?: string): Promise<void> {
-    const measurement = performanceMonitor.startMeasurement('cosmos_delete', {
-      container: container.id || 'unknown',
-      hasPartitionKey: !!partitionKey,
-    });
-
-    try {
-      await container.item(id, partitionKey).delete();
-      
-      measurement.finish(true, {
-        cached: false,
-      });
-    } catch (error) {
-      measurement.finish(false, {
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
-      throw error;
-    }
+    await OptimizedCosmosOperations.delete(container, id, partitionKey);
   },
 };
+
+// Export enhanced operations for new code
+export { OptimizedCosmosOperations };

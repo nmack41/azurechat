@@ -1,0 +1,141 @@
+{
+  "indexingMode": "consistent",
+  "automatic": true,
+  "includedPaths": [
+    {
+      "path": "/*"
+    }
+  ],
+  "excludedPaths": [
+    {
+      "path": "/content/*"
+    },
+    {
+      "path": "/personaMessage/*"
+    },
+    {
+      "path": "/multiModalImage/*"
+    },
+    {
+      "path": "/_etag"
+    },
+    {
+      "path": "/_rid"
+    },
+    {
+      "path": "/_self"
+    },
+    {
+      "path": "/_attachments"
+    },
+    {
+      "path": "/_ts"
+    }
+  ],
+  "compositeIndexes": [
+    [
+      {
+        "path": "/type",
+        "order": "ascending"
+      },
+      {
+        "path": "/userId",
+        "order": "ascending"
+      },
+      {
+        "path": "/isDeleted",
+        "order": "ascending"
+      },
+      {
+        "path": "/lastMessageAt",
+        "order": "descending"
+      }
+    ],
+    [
+      {
+        "path": "/type",
+        "order": "ascending"
+      },
+      {
+        "path": "/threadId",
+        "order": "ascending"
+      },
+      {
+        "path": "/userId",
+        "order": "ascending"
+      },
+      {
+        "path": "/createdAt",
+        "order": "ascending"
+      }
+    ],
+    [
+      {
+        "path": "/type",
+        "order": "ascending"
+      },
+      {
+        "path": "/threadId",
+        "order": "ascending"
+      },
+      {
+        "path": "/userId",
+        "order": "ascending"
+      },
+      {
+        "path": "/isDeleted",
+        "order": "ascending"
+      },
+      {
+        "path": "/createdAt",
+        "order": "descending"
+      }
+    ],
+    [
+      {
+        "path": "/type",
+        "order": "ascending"
+      },
+      {
+        "path": "/userId",
+        "order": "ascending"
+      },
+      {
+        "path": "/isDeleted",
+        "order": "ascending"
+      },
+      {
+        "path": "/createdAt",
+        "order": "descending"
+      }
+    ],
+    [
+      {
+        "path": "/type",
+        "order": "ascending"
+      },
+      {
+        "path": "/isPublished",
+        "order": "ascending"
+      },
+      {
+        "path": "/userId",
+        "order": "ascending"
+      },
+      {
+        "path": "/createdAt",
+        "order": "descending"
+      }
+    ],
+    [
+      {
+        "path": "/type",
+        "order": "ascending"
+      },
+      {
+        "path": "/id",
+        "order": "ascending"
+      }
+    ]
+  ]
+}
