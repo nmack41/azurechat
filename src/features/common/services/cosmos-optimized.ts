@@ -4,6 +4,9 @@
 import { CosmosClient, Container, SqlQuerySpec, FeedOptions } from "@azure/cosmos";
 import { DefaultAzureCredential } from "@azure/identity";
 import { LRUCache } from "../performance-utils";
+import { performanceMonitor } from "../observability/performance-monitor";
+import { connectionPoolManager } from "./connection-pool-manager";
+import { streamingQueryService, StreamingOptions, StreamingCallback } from "./streaming-query-service";
 
 // Environment configuration
 const DB_NAME = process.env.AZURE_COSMOSDB_DB_NAME || "chat";
@@ -112,22 +115,40 @@ export class OptimizedCosmosService {
   private client: CosmosClient;
   private queryCache: LRUCache<string, CacheEntry<any>>;
   private containerCache = new Map<string, Container>();
+  private useConnectionPool: boolean;
 
-  constructor(cacheSize = 100) {
+  constructor(cacheSize = 100, useConnectionPool = true) {
     this.client = CosmosClientSingleton.getInstance();
     this.queryCache = new LRUCache(cacheSize);
+    this.useConnectionPool = useConnectionPool;
+  }
+
+  /**
+   * Execute operation with connection pooling if enabled
+   */
+  private async executeWithPooling<T>(
+    operation: (client: CosmosClient) => Promise<T>
+  ): Promise<T> {
+    if (this.useConnectionPool) {
+      return connectionPoolManager.executeWithConnection(operation);
+    } else {
+      return operation(this.client);
+    }
   }
 
   /**
    * Get container with caching
    */
-  private getContainer(containerName: string): Container {
-    if (!this.containerCache.has(containerName)) {
-      const database = this.client.database(DB_NAME);
+  private getContainer(containerName: string, client?: CosmosClient): Container {
+    const keyClient = client || this.client;
+    const cacheKey = `${containerName}-${keyClient.constructor.name}`;
+    
+    if (!this.containerCache.has(cacheKey)) {
+      const database = keyClient.database(DB_NAME);
       const container = database.container(containerName);
-      this.containerCache.set(containerName, container);
+      this.containerCache.set(cacheKey, container);
     }
-    return this.containerCache.get(containerName)!;
+    return this.containerCache.get(cacheKey)!;
   }
 
   /**
@@ -172,44 +193,69 @@ export class OptimizedCosmosService {
     query: SqlQuerySpec,
     options: PaginationOptions & FeedOptions = {}
   ): Promise<PaginatedResponse<T>> {
-    const pageSize = Math.min(options.pageSize || DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE);
-    
-    const feedOptions: FeedOptions = {
-      ...options,
-      maxItemCount: pageSize,
-      continuationToken: options.continuationToken,
-    };
+    const measurement = performanceMonitor.startMeasurement('cosmos_query_paginated', {
+      container: container.id,
+      hasPartitionKey: !!options.partitionKey,
+    });
 
-    // Don't cache paginated queries with continuation tokens
-    if (!options.continuationToken && options.partitionKey) {
-      const cacheKey = this.generateCacheKey(query, options.partitionKey as string);
-      const cached = this.queryCache.get(cacheKey);
+    try {
+      const pageSize = Math.min(options.pageSize || DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE);
       
-      if (this.isCacheValid(cached)) {
-        return cached.data;
+      const feedOptions: FeedOptions = {
+        ...options,
+        maxItemCount: pageSize,
+        continuationToken: options.continuationToken,
+      };
+
+      // Don't cache paginated queries with continuation tokens
+      if (!options.continuationToken && options.partitionKey) {
+        const cacheKey = this.generateCacheKey(query, options.partitionKey as string);
+        const cached = this.queryCache.get(cacheKey);
+        
+        if (this.isCacheValid(cached)) {
+          measurement.finish(true, {
+            cached: true,
+            resultCount: cached.data.items.length,
+          });
+          return cached.data;
+        }
       }
-    }
 
-    const response = await container.items
-      .query<T>(query, feedOptions)
-      .fetchNext();
-
-    const result: PaginatedResponse<T> = {
-      items: response.resources,
-      continuationToken: response.continuationToken,
-      hasMore: !!response.continuationToken,
-    };
-
-    // Cache the first page only
-    if (!options.continuationToken && options.partitionKey) {
-      const cacheKey = this.generateCacheKey(query, options.partitionKey as string);
-      this.queryCache.set(cacheKey, {
-        data: result,
-        timestamp: Date.now(),
+      const response = await this.executeWithPooling(async (client) => {
+        const pooledContainer = this.getContainer(container.id.split('/').pop() || CONTAINER_NAME, client);
+        return pooledContainer.items.query<T>(query, feedOptions).fetchNext();
       });
-    }
 
-    return result;
+      const result: PaginatedResponse<T> = {
+        items: response.resources,
+        continuationToken: response.continuationToken,
+        hasMore: !!response.continuationToken,
+      };
+
+      // Cache the first page only
+      if (!options.continuationToken && options.partitionKey) {
+        const cacheKey = this.generateCacheKey(query, options.partitionKey as string);
+        this.queryCache.set(cacheKey, {
+          data: result,
+          timestamp: Date.now(),
+        });
+      }
+
+      measurement.finish(true, {
+        cached: false,
+        requestUnits: response.requestCharge,
+        resultCount: result.items.length,
+        query: query.query,
+      });
+
+      return result;
+    } catch (error) {
+      measurement.finish(false, {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        query: query.query,
+      });
+      throw error;
+    }
   }
 
   /**
@@ -220,28 +266,53 @@ export class OptimizedCosmosService {
     query: SqlQuerySpec,
     options: FeedOptions = {}
   ): Promise<T[]> {
-    if (options.partitionKey) {
-      const cacheKey = this.generateCacheKey(query, options.partitionKey as string);
-      const cached = this.queryCache.get(cacheKey);
-      
-      if (this.isCacheValid(cached)) {
-        return cached.data;
+    const measurement = performanceMonitor.startMeasurement('cosmos_query', {
+      container: container.id,
+      hasPartitionKey: !!options.partitionKey,
+    });
+
+    try {
+      if (options.partitionKey) {
+        const cacheKey = this.generateCacheKey(query, options.partitionKey as string);
+        const cached = this.queryCache.get(cacheKey);
+        
+        if (this.isCacheValid(cached)) {
+          measurement.finish(true, {
+            cached: true,
+            resultCount: cached.data.length,
+          });
+          return cached.data;
+        }
       }
-    }
 
-    const { resources } = await container.items
-      .query<T>(query, options)
-      .fetchAll();
-
-    if (options.partitionKey) {
-      const cacheKey = this.generateCacheKey(query, options.partitionKey as string);
-      this.queryCache.set(cacheKey, {
-        data: resources,
-        timestamp: Date.now(),
+      const response = await this.executeWithPooling(async (client) => {
+        const pooledContainer = this.getContainer(container.id.split('/').pop() || CONTAINER_NAME, client);
+        return pooledContainer.items.query<T>(query, options).fetchAll();
       });
-    }
 
-    return resources;
+      if (options.partitionKey) {
+        const cacheKey = this.generateCacheKey(query, options.partitionKey as string);
+        this.queryCache.set(cacheKey, {
+          data: response.resources,
+          timestamp: Date.now(),
+        });
+      }
+
+      measurement.finish(true, {
+        cached: false,
+        requestUnits: response.requestCharge,
+        resultCount: response.resources.length,
+        query: query.query,
+      });
+
+      return response.resources;
+    } catch (error) {
+      measurement.finish(false, {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        query: query.query,
+      });
+      throw error;
+    }
   }
 
   /**
@@ -282,12 +353,30 @@ export class OptimizedCosmosService {
     item: T & { id: string },
     partitionKey: string
   ): Promise<T> {
-    const response = await container.items.upsert(item);
-    
-    // Invalidate relevant caches
-    this.invalidateCache(partitionKey);
-    
-    return response.resource;
+    const measurement = performanceMonitor.startMeasurement('cosmos_upsert', {
+      container: container.id,
+    });
+
+    try {
+      const response = await this.executeWithPooling(async (client) => {
+        const pooledContainer = this.getContainer(container.id.split('/').pop() || CONTAINER_NAME, client);
+        return pooledContainer.items.upsert(item);
+      });
+      
+      // Invalidate relevant caches
+      this.invalidateCache(partitionKey);
+      
+      measurement.finish(true, {
+        requestUnits: response.requestCharge,
+      });
+      
+      return response.resource;
+    } catch (error) {
+      measurement.finish(false, {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      throw error;
+    }
   }
 
   /**
@@ -340,10 +429,81 @@ export class OptimizedCosmosService {
   }
 
   /**
+   * Get connection pool statistics
+   */
+  public getConnectionPoolStats() {
+    if (this.useConnectionPool) {
+      return connectionPoolManager.getStats();
+    }
+    return null;
+  }
+
+  /**
    * Clear all caches
    */
   public clearCache(): void {
     this.queryCache.clear();
+  }
+
+  /**
+   * Stream large query results for memory-efficient processing
+   */
+  public async streamQuery<T>(
+    container: Container,
+    query: SqlQuerySpec,
+    callback: StreamingCallback<T>,
+    options: StreamingOptions = {}
+  ): Promise<string> {
+    return streamingQueryService.streamQuery(
+      container,
+      query,
+      callback,
+      options
+    );
+  }
+
+  /**
+   * Create async iterator for streaming large datasets
+   */
+  public streamAsyncIterator<T>(
+    container: Container,
+    query: SqlQuerySpec,
+    options: StreamingOptions = {}
+  ): AsyncIterableIterator<any> {
+    return streamingQueryService.streamAsyncIterator(container, query, options);
+  }
+
+  /**
+   * Stream and process data in batches
+   */
+  public async streamBatches<T>(
+    container: Container,
+    query: SqlQuerySpec,
+    batchSize: number,
+    onBatch: (batch: any[], batchIndex: number) => Promise<void>,
+    options: StreamingOptions = {}
+  ): Promise<string> {
+    return streamingQueryService.streamBatches(
+      container,
+      query,
+      batchSize,
+      onBatch,
+      options
+    );
+  }
+
+  /**
+   * Cancel a streaming operation
+   */
+  public cancelStream(streamId: string): boolean {
+    return streamingQueryService.cancelStream(streamId);
+  }
+
+  /**
+   * Get streaming statistics
+   */
+  public getStreamingStats() {
+    return streamingQueryService.getGlobalStats();
   }
 
   /**
