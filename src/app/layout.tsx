@@ -2,6 +2,7 @@ import { AI_NAME } from "@/features/theme/theme-config";
 import { ThemeProvider } from "@/features/theme/theme-provider";
 import { Toaster } from "@/features/ui/toaster";
 import { AppErrorBoundary } from "@/features/ui/error-boundary";
+import { ObservabilityProvider } from "@/features/common/observability/observability-provider";
 import { cn } from "@/ui/lib";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -31,10 +32,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AppErrorBoundary>
-            {children}
-            <Toaster />
-          </AppErrorBoundary>
+          <ObservabilityProvider>
+            <AppErrorBoundary>
+              {children}
+              <Toaster />
+            </AppErrorBoundary>
+          </ObservabilityProvider>
         </ThemeProvider>
       </body>
     </html>

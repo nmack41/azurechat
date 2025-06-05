@@ -5,6 +5,7 @@ import {
   addCorrelationHeaders, 
   logRequest 
 } from "@/features/common/observability/correlation-middleware";
+import { securityAudit } from "@/features/common/observability/security-audit";
 
 const requireAuth: string[] = [
   "/chat",
@@ -32,6 +33,14 @@ export async function middleware(request: NextRequest) {
       // Add user ID to context if available
       if (token?.email) {
         context.userId = token.email;
+        
+        // Record successful authentication for protected routes
+        securityAudit.recordAuthSuccess(token.email, {
+          method: 'jwt_token',
+          correlationId: context.correlationId,
+          ipAddress: request.ip || request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown',
+          userAgent: request.headers.get('user-agent') || 'unknown',
+        });
       }
 
       //check not logged in
@@ -41,6 +50,25 @@ export async function middleware(request: NextRequest) {
         
         // Log unauthorized access attempt
         logRequest(context, 401);
+        
+        // Record security event for unauthorized access
+        securityAudit.recordSecurityEvent(
+          'UNAUTHORIZED_ACCESS',
+          'MEDIUM',
+          'authentication',
+          'access_denied',
+          {
+            attemptedPath: pathname,
+            reason: 'no_token',
+          },
+          {
+            correlationId: context.correlationId,
+            ipAddress: request.ip || request.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown',
+            userAgent: request.headers.get('user-agent') || 'unknown',
+            route: pathname,
+            method: request.method,
+          }
+        );
         
         return addCorrelationHeaders(redirectResponse, context.correlationId);
       }
@@ -53,6 +81,19 @@ export async function middleware(request: NextRequest) {
           
           // Log insufficient privileges
           logRequest(context, 403);
+          
+          // Record privilege escalation attempt
+          securityAudit.recordPrivilegeEscalation(
+            token.email || 'unknown',
+            `access_admin_route_${pathname}`,
+            {
+              role: 'user',
+              requiredRole: 'admin',
+              correlationId: context.correlationId,
+              route: pathname,
+              method: request.method,
+            }
+          );
           
           return addCorrelationHeaders(rewriteResponse, context.correlationId);
         }

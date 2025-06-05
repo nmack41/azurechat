@@ -2,6 +2,7 @@
 
 import React from "react";
 import { LoadingIndicator } from "../../loading";
+import { NetworkStatusIndicator } from "../../network-status";
 
 interface ChatInputAreaProps {
   status?: string;
@@ -25,12 +26,17 @@ export const ChatInputForm = React.forwardRef<
 ChatInputForm.displayName = "ChatInputArea";
 
 export const ChatInputStatus = (props: { status?: string }) => {
-  if (props.status === undefined || props.status === "") return null;
   return (
-    <div className=" flex justify-center">
-      <div className="border bg-background p-2 px-5  rounded-full flex gap-2 items-center text-sm">
-        <LoadingIndicator isLoading={true} /> {props.status}
-      </div>
+    <div className="flex justify-center items-center gap-3">
+      {/* Network Status Indicator */}
+      <NetworkStatusIndicator showQuality={true} />
+      
+      {/* Chat Status */}
+      {props.status && props.status !== "" && (
+        <div className="border bg-background p-2 px-5 rounded-full flex gap-2 items-center text-sm">
+          <LoadingIndicator isLoading={true} /> {props.status}
+        </div>
+      )}
     </div>
   );
 };

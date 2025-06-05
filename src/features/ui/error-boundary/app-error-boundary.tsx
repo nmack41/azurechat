@@ -5,11 +5,45 @@
 
 import React from 'react';
 import { BaseErrorBoundary } from './base-error-boundary';
+import { ErrorReferenceService } from '@/features/common/errors/error-reference';
+import { appInsights } from '@/features/common/observability/app-insights';
+import { securityAudit } from '@/features/common/observability/security-audit';
 
 /**
  * Application-level error boundary for catastrophic failures
  */
 export class AppErrorBoundary extends BaseErrorBoundary {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    super.componentDidCatch(error, errorInfo);
+    
+    // Track in Application Insights
+    if (appInsights.isReady()) {
+      appInsights.trackException(error, {
+        severity: 'critical',
+        source: 'app_error_boundary',
+        componentStack: errorInfo.componentStack,
+        errorBoundary: 'AppErrorBoundary',
+      });
+    }
+
+    // Record security event for critical application errors
+    securityAudit.recordSecurityEvent(
+      'SECURITY_CONFIG_CHANGE',
+      'CRITICAL', 
+      'application',
+      'error_boundary_triggered',
+      {
+        errorMessage: error.message,
+        componentStack: errorInfo.componentStack,
+        errorBoundary: 'AppErrorBoundary',
+      },
+      {
+        correlationId: this.state.errorId || undefined,
+        route: typeof window !== 'undefined' ? window.location.pathname : undefined,
+      }
+    );
+  }
+
   render() {
     if (this.state.hasError) {
       return (
@@ -48,9 +82,20 @@ const AppErrorFallback: React.FC<AppErrorFallbackProps> = ({
   onReload,
   onHome,
 }) => {
+  // Get user-friendly error information
+  const errorReference = error ? ErrorReferenceService.getReference('SYS-001') : null;
+  const userErrorMessage = errorReference 
+    ? ErrorReferenceService.generateUserMessage(error as any)
+    : {
+        referenceCode: errorId || 'SYS-001',
+        title: 'Application Error',
+        message: 'The application encountered an unexpected error',
+        actions: ['Try refreshing the page', 'Contact support'],
+      };
+
   const copyErrorReport = async () => {
     const report = {
-      errorId,
+      errorId: userErrorMessage.referenceCode,
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
       url: window.location.href,
@@ -59,6 +104,7 @@ const AppErrorFallback: React.FC<AppErrorFallbackProps> = ({
         message: error.message,
         stack: error.stack,
       } : null,
+      supportUrl: userErrorMessage.supportUrl,
     };
 
     try {
@@ -80,9 +126,9 @@ const AppErrorFallback: React.FC<AppErrorFallbackProps> = ({
                     d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.732 18.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold mb-2">Application Error</h1>
+          <h1 className="text-3xl font-bold mb-2">{userErrorMessage.title}</h1>
           <p className="text-red-100">
-            The application encountered an unexpected error
+            {userErrorMessage.message}
           </p>
         </div>
 
@@ -93,19 +139,25 @@ const AppErrorFallback: React.FC<AppErrorFallbackProps> = ({
               We're sorry, but something went wrong. The error has been logged and our team has been notified.
             </p>
             
-            {errorId && (
-              <div className="bg-gray-100 rounded-lg p-4 mb-6">
-                <p className="text-sm text-gray-600 mb-2">
-                  <strong>Error Reference:</strong>
-                </p>
-                <code className="text-sm font-mono bg-white px-3 py-1 rounded border">
-                  {errorId}
-                </code>
-                <p className="text-xs text-gray-500 mt-2">
-                  Please include this reference when contacting support
-                </p>
-              </div>
-            )}
+            <div className="bg-gray-100 rounded-lg p-4 mb-6">
+              <p className="text-sm text-gray-600 mb-2">
+                <strong>Error Reference:</strong>
+              </p>
+              <code className="text-sm font-mono bg-white px-3 py-1 rounded border">
+                {userErrorMessage.referenceCode}
+              </code>
+              <p className="text-xs text-gray-500 mt-2">
+                Please include this reference when contacting support
+              </p>
+              {userErrorMessage.supportUrl && (
+                <a 
+                  href={userErrorMessage.supportUrl}
+                  className="text-blue-600 hover:underline text-sm mt-2 inline-block"
+                >
+                  View troubleshooting guide →
+                </a>
+              )}
+            </div>
           </div>
 
           {/* Action Buttons */}
@@ -163,12 +215,11 @@ const AppErrorFallback: React.FC<AppErrorFallbackProps> = ({
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
-                <h4 className="font-medium text-gray-700 mb-2">Common Solutions:</h4>
+                <h4 className="font-medium text-gray-700 mb-2">Suggested Solutions:</h4>
                 <ul className="space-y-1 text-gray-600">
-                  <li>• Try refreshing the page</li>
-                  <li>• Check your internet connection</li>
-                  <li>• Clear your browser cache</li>
-                  <li>• Try a different browser</li>
+                  {userErrorMessage.actions.map((action, index) => (
+                    <li key={index}>• {action}</li>
+                  ))}
                 </ul>
               </div>
               <div>
