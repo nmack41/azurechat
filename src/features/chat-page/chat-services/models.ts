@@ -40,6 +40,7 @@ export interface UserPrompt {
   id: string; // thread id
   message: string;
   multimodalImage: string;
+  correlationId?: string; // Optional correlation ID for tracing
 }
 
 export interface ChatDocumentModel {
