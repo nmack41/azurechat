@@ -39,5 +39,11 @@ export {
   ErrorSerializer,
 } from './error-serializer';
 
+// Error reference system
+export {
+  ErrorReferenceService,
+} from './error-reference';
+export type { ErrorReference } from './error-reference';
+
 // Utility functions for error handling
 export * from './error-utils';

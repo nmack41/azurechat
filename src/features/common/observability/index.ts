@@ -10,6 +10,45 @@ export type {
   HealthChecker 
 } from './health-service';
 
+// Performance monitoring and metrics
+export { performanceMonitor } from './performance-monitor';
+export type {
+  QueryMetric,
+  AggregatedMetric,
+  PerformanceAlert,
+  MonitoringConfig,
+} from './performance-monitor';
+
+// Performance dashboard (client-side)
+export { 
+  PerformanceDashboard,
+  PerformanceWidget 
+} from './performance-dashboard';
+
+// Azure Application Insights integration
+export { appInsights } from './app-insights';
+export type { AppInsightsConfig } from './app-insights';
+
+// Security audit logging
+export { securityAudit } from './security-audit';
+export type { 
+  SecurityEvent, 
+  SecurityEventType, 
+  SecurityLevel,
+  AuditConfig 
+} from './security-audit';
+
+// Offline detection and network monitoring
+export { 
+  offlineDetection,
+  useNetworkStatus 
+} from './offline-detection';
+export type { 
+  NetworkStatus, 
+  NetworkInfo, 
+  OfflineCapability 
+} from './offline-detection';
+
 // Correlation tracking and distributed tracing
 export {
   generateCorrelationId,
