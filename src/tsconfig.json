@@ -20,7 +20,39 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "@/ui/*": ["./features/ui/*"]
+      
+      // Feature-specific paths for better organization
+      "@/features/*": ["./features/*"],
+      "@/app/*": ["./app/*"],
+      "@/types/*": ["./types/*"],
+      
+      // UI component paths (most frequently imported)
+      "@/ui/*": ["./features/ui/*"],
+      "@/components/*": ["./features/ui/*"],
+      
+      // Service layer paths
+      "@/services/*": ["./features/common/services/*"],
+      "@/utils/*": ["./features/common/*"],
+      
+      // Observability and monitoring
+      "@/observability/*": ["./features/common/observability/*"],
+      "@/errors/*": ["./features/common/errors/*"],
+      
+      // Valtio store patterns
+      "@/valtio/*": ["./features/common/valtio-patterns/*"],
+      
+      // Page-specific imports
+      "@/chat/*": ["./features/chat-page/*"],
+      "@/persona/*": ["./features/persona-page/*"],
+      "@/extensions/*": ["./features/extensions-page/*"],
+      "@/reporting/*": ["./features/reporting-page/*"],
+      "@/prompt/*": ["./features/prompt-page/*"],
+      "@/auth/*": ["./features/auth-page/*"],
+      "@/menu/*": ["./features/main-menu/*"],
+      
+      // Test utilities
+      "@/test-utils/*": ["./__tests__/utils/*"],
+      "@/test/*": ["./__tests__/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
