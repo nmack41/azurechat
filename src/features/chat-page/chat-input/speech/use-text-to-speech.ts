@@ -1,17 +1,12 @@
 import { showError } from "@/features/globals/global-message-store";
-import {
-  AudioConfig,
-  ResultReason,
-  SpeakerAudioDestination,
-  SpeechConfig,
-  SpeechSynthesizer,
-} from "microsoft-cognitiveservices-speech-sdk";
+import { loadSpeechSDK, SpeechSDKTypes } from "./speech-sdk-lazy";
 import { useEffect } from "react";
 import { proxy, useSnapshot } from "valtio";
 import { GetSpeechToken } from "./speech-service";
 import { speechToTextStore } from "./use-speech-to-text";
 
-let player: SpeakerAudioDestination | undefined = undefined;
+let player: any | undefined = undefined;
+let speechSDK: SpeechSDKTypes | null = null;
 
 class TextToSpeech {
   public isPlaying: boolean = false;
@@ -36,6 +31,13 @@ class TextToSpeech {
     if (this.isPlaying) {
       this.stopPlaying();
     }
+
+    // Lazy load the Speech SDK
+    if (!speechSDK) {
+      speechSDK = await loadSpeechSDK();
+    }
+
+    const { SpeechConfig, AudioConfig, SpeechSynthesizer, SpeakerAudioDestination, ResultReason } = speechSDK;
 
     // Dispose of previous player to prevent memory leaks
     if (player) {

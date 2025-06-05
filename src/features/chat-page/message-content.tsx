@@ -19,7 +19,7 @@ interface MessageContentProps {
   };
 }
 
-const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
+const MessageContent: React.FC<MessageContentProps> = React.memo(({ message }) => {
   if (message.role === "assistant" || message.role === "user") {
     return (
       <>
@@ -61,7 +61,10 @@ const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
   }
 
   return null;
-};
+});
+
+// Set display name for debugging
+MessageContent.displayName = 'MessageContent';
 
 const toJson = (value: string) => {
   try {

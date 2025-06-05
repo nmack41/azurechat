@@ -10,8 +10,7 @@ import {
   SelectValue,
 } from "@/features/ui/select";
 import { SheetTitle } from "@/ui/sheet";
-import { javascript } from "@codemirror/lang-javascript";
-import CodeMirror from "@uiw/react-codemirror";
+import { CodeEditor } from "./code-editor-lazy";
 import { ChevronDown, ChevronUp, Copy, Plus, Trash } from "lucide-react";
 import { useTheme } from "next-themes";
 import { extensionStore, useExtensionState } from "../extension-store";
@@ -106,15 +105,14 @@ export const AddFunction = () => {
             <Label>GPT Function call definition (JSON)</Label>
             <div className="w-[580px] max-w-[580px]">
               <input type="hidden" name="code[]" value={func.code}/>
-              <CodeMirror
+              <CodeEditor
                 value={func.code}
-                lang="json"
-                id="code-mirror"
                 onChange={(value) => {
                   extensionStore.updateFunctionCode(func.id, value);
                 }}
-                extensions={[javascript()]}
-                theme={theme === "dark" ? "dark" : ("light" as const)}
+                placeholder="Enter GPT function definition..."
+                theme={theme}
+                height="300px"
               />
             </div>
           </div>

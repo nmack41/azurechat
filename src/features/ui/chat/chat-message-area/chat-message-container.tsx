@@ -16,4 +16,5 @@ const ChatMessageContainer: ForwardRefRenderFunction<
   );
 };
 
-export default React.forwardRef(ChatMessageContainer);
+// Memoize the component to prevent unnecessary re-renders
+export default React.memo(React.forwardRef(ChatMessageContainer));

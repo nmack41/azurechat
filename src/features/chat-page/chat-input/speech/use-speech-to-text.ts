@@ -1,22 +1,23 @@
 import { showError } from "@/features/globals/global-message-store";
-import {
-  AudioConfig,
-  AutoDetectSourceLanguageConfig,
-  SpeechConfig,
-  SpeechRecognizer,
-} from "microsoft-cognitiveservices-speech-sdk";
+import { loadSpeechSDK, SpeechSDKTypes } from "./speech-sdk-lazy";
 import { useEffect } from "react";
 import { proxy, useSnapshot } from "valtio";
 import { chatStore } from "../../chat-store";
 import { GetSpeechToken } from "./speech-service";
 
-let speechRecognizer: SpeechRecognizer | undefined = undefined;
+let speechRecognizer: any | undefined = undefined;
+let speechSDK: SpeechSDKTypes | null = null;
 
 class SpeechToText {
   public isMicrophoneUsed: boolean = false;
   public isMicrophoneReady: boolean = false;
 
   public async startRecognition() {
+    // Lazy load the Speech SDK
+    if (!speechSDK) {
+      speechSDK = await loadSpeechSDK();
+    }
+    
     const token = await GetSpeechToken();
 
     if (token.error) {
@@ -27,6 +28,8 @@ class SpeechToText {
     this.isMicrophoneReady = true;
     this.isMicrophoneUsed = true;
 
+    const { SpeechConfig, AudioConfig, AutoDetectSourceLanguageConfig, SpeechRecognizer } = speechSDK!;
+    
     const speechConfig = SpeechConfig.fromAuthorizationToken(
       token.token,
       token.region

@@ -18,4 +18,5 @@ const ChatMessageContentArea: ForwardRefRenderFunction<
   );
 };
 
-export default React.forwardRef(ChatMessageContentArea);
+// Memoize the component to prevent unnecessary re-renders
+export default React.memo(React.forwardRef(ChatMessageContentArea));

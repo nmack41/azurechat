@@ -1,5 +1,5 @@
 import Markdoc from "@markdoc/markdoc";
-import React, { FC } from "react";
+import React, { FC, useMemo } from "react";
 import { Citation } from "./citation";
 import { CodeBlock } from "./code-block";
 import { citationConfig } from "./config";
@@ -14,20 +14,24 @@ interface Props {
   ) => Promise<JSX.Element>;
 }
 
-export const Markdown: FC<Props> = (props) => {
-  const ast = Markdoc.parse(props.content);
+export const Markdown: FC<Props> = React.memo((props) => {
+  // Memoize the parsed and transformed content to avoid re-processing
+  const renderedContent = useMemo(() => {
+    const ast = Markdoc.parse(props.content);
+    const content = Markdoc.transform(ast, {
+      ...citationConfig,
+    });
+    
+    return Markdoc.renderers.react(content, React, {
+      components: { Citation, Paragraph, CodeBlock },
+    });
+  }, [props.content]);
 
-  const content = Markdoc.transform(ast, {
-    ...citationConfig,
-  });
-
-  const WithContext = () => (
+  return (
     <MarkdownProvider onCitationClick={props.onCitationClick}>
-      {Markdoc.renderers.react(content, React, {
-        components: { Citation, Paragraph, CodeBlock },
-      })}
+      {renderedContent}
     </MarkdownProvider>
   );
+});
 
-  return <WithContext />;
-};
+Markdown.displayName = 'Markdown';

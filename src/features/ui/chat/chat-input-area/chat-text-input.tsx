@@ -1,6 +1,7 @@
 import React from "react";
 
-export const ChatTextInput = React.forwardRef<
+// Memoized text input to prevent unnecessary re-renders
+export const ChatTextInput = React.memo(React.forwardRef<
   HTMLTextAreaElement,
   React.TextareaHTMLAttributes<HTMLTextAreaElement> // Add ChatInputAreaProps to the type definition
 >(({ ...props }, ref) => {
@@ -12,5 +13,5 @@ export const ChatTextInput = React.forwardRef<
       {...props}
     />
   );
-});
+}));
 ChatTextInput.displayName = "ChatTextInput";
