@@ -128,18 +128,7 @@ export function correlationMiddleware(request: NextRequest, response: NextRespon
   return addCorrelationHeaders(response, correlationId);
 }
 
-/**
- * React context for correlation ID (client-side)
- */
-import { createContext, useContext } from 'react';
-
-const CorrelationContext = createContext<string | null>(null);
-
-export const CorrelationProvider = CorrelationContext.Provider;
-
-export function useCorrelationId(): string | null {
-  return useContext(CorrelationContext);
-}
+// Note: React context functionality moved to use-correlation.tsx to avoid server-side import issues
 
 /**
  * Fetch wrapper that includes correlation ID
