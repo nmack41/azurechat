@@ -73,3 +73,15 @@ export {
 export {
   CosmosService
 } from './cosmos-service';
+
+// Cached services
+export {
+  cachedCosmosService,
+  CachedCosmosService
+} from './cosmos-service-cached';
+
+export {
+  cosmosQueryCache,
+  CosmosQueryCache,
+  COMMON_QUERIES
+} from './cosmos-cache-enhanced';
