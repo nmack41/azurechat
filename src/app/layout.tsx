@@ -1,8 +1,5 @@
 import { AI_NAME } from "@/features/theme/theme-config";
-import { ThemeProvider } from "@/features/theme/theme-provider";
-import { Toaster } from "@/ui/toaster";
-import { AppErrorBoundary } from "@/ui/error-boundary";
-import { ObservabilityProvider } from "@/observability/observability-provider";
+import { RootProviders } from "@/features/globals/root-providers";
 import { cn } from "@/ui/lib";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -26,19 +23,9 @@ export default function RootLayout({
       <body
         className={cn(inter.className, "h-full w-full flex  bg-background")}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <ObservabilityProvider>
-            <AppErrorBoundary>
-              {children}
-              <Toaster />
-            </AppErrorBoundary>
-          </ObservabilityProvider>
-        </ThemeProvider>
+        <RootProviders>
+          {children}
+        </RootProviders>
       </body>
     </html>
   );

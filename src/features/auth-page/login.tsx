@@ -1,7 +1,8 @@
 "use client";
 import { AI_NAME } from "@/features/theme/theme-config";
-import { signIn } from "next-auth/react";
-import { FC } from "react";
+import { signIn, useSession } from "next-auth/react";
+import { FC, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import {
@@ -18,6 +19,29 @@ interface LoginProps {
 }
 
 export const LogIn: FC<LoginProps> = (props) => {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "authenticated" && session) {
+      router.push("/chat");
+    }
+  }, [status, session, router]);
+
+  if (status === "loading") {
+    return (
+      <Card className="flex gap-2 flex-col min-w-[300px]">
+        <CardContent className="flex justify-center p-6">
+          <div>Loading...</div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (status === "authenticated") {
+    return null;
+  }
+
   return (
     <Card className="flex gap-2 flex-col min-w-[300px]">
       <CardHeader className="gap-2">
