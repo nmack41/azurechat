@@ -262,6 +262,12 @@ resource kv 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
     enabledForDeployment: false
     enabledForDiskEncryption: true
     enabledForTemplateDeployment: false
+    networkAcls: {
+      defaultAction: 'Deny'
+      bypass: 'AzureServices'
+      ipRules: []
+      virtualNetworkRules: []
+    }
   }
 
   resource AZURE_OPENAI_API_KEY 'secrets' = if (!disableLocalAuth) {
@@ -405,6 +411,9 @@ resource searchService 'Microsoft.Search/searchServices@2022-09-01' = {
   name: search_name
   location: location
   tags: tags
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     partitionCount: 1
     publicNetworkAccess: 'enabled'
@@ -468,7 +477,15 @@ resource storage 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   kind: 'StorageV2'
   sku: storageServiceSku
   properties:{
+    allowBlobPublicAccess: false
     allowSharedKeyAccess: !disableLocalAuth
+    minimumTlsVersion: 'TLS1_2'
+    networkAcls: {
+      defaultAction: 'Deny'
+      bypass: 'AzureServices'
+      ipRules: []
+      virtualNetworkRules: []
+    }
   }
 
   resource blobServices 'blobServices' = {
