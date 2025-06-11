@@ -26,7 +26,7 @@ const configureIdentityProvider = () => {
             isAdmin: adminEmails?.includes(profile.email.toLowerCase()),
             image: image,
           };
-          console.log("GitHub profile:", newProfile);
+          // Profile created successfully
           return newProfile;
         },
       })
@@ -47,7 +47,7 @@ const configureIdentityProvider = () => {
           params: {
             scope: "openid profile User.Read",
             prompt: "login",
-            domain_hint: "cre-chat.com",
+            domain_hint: process.env.AZURE_AD_DOMAIN_HINT || "",
           },
         },
         async profile(profile, tokens) {
@@ -65,7 +65,7 @@ const configureIdentityProvider = () => {
               adminEmails?.includes(profile.preferred_username?.toLowerCase()),
             image: image,
           };
-          console.log("Azure AD profile:", newProfile);
+          // Profile created successfully
           return newProfile;
         },
       })
@@ -85,22 +85,37 @@ const configureIdentityProvider = () => {
           password: { label: "Password", type: "password" },
         },
         async authorize(credentials, req): Promise<any> {
-          // You can put logic here to validate the credentials and return a user.
-          // We're going to take any username and make a new user with it
-          // Create the id as the hash of the email as per userHashedId (helpers.ts)
-          const username = credentials?.username || "dev";
+          // Validate credentials even in dev mode to prevent authentication bypass
+          if (!credentials?.username || !credentials?.password) {
+            console.error("Dev auth: Missing username or password");
+            return null;
+          }
+
+          // Simple dev mode validation - require password to match username
+          // In production, this would connect to a real auth system
+          if (credentials.password !== credentials.username) {
+            console.error("Dev auth: Invalid credentials for", credentials.username);
+            return null;
+          }
+
+          // Only allow specific dev users to prevent arbitrary access
+          const allowedDevUsers = ["dev", "admin", "test"];
+          if (!allowedDevUsers.includes(credentials.username)) {
+            console.error("Dev auth: User not in allowed list:", credentials.username);
+            return null;
+          }
+
+          const username = credentials.username;
           const email = username + "@localhost";
           const user = {
             id: hashValue(email),
             name: username,
             email: email,
-            isAdmin: adminEmails?.includes(email),
+            isAdmin: adminEmails?.includes(email) || username === "admin",
             image: "",
           };
-          console.log(
-            "=== DEV USER LOGGED IN:\n",
-            JSON.stringify(user, null, 2)
-          );
+          
+          console.log("=== DEV USER AUTHENTICATED:", username);
           return user;
         },
       })

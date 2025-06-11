@@ -1,7 +1,5 @@
 import { CheckIcon, ClipboardIcon } from "lucide-react";
 import { FC, memo, useEffect, useState } from "react";
-import { Prism } from "react-syntax-highlighter";
-import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { Button } from "../button";
 
 export const fence = {
@@ -23,6 +21,7 @@ interface Props {
 
 export const CodeBlock: FC<Props> = memo(({ language, children }) => {
   const [isIconChecked, setIsIconChecked] = useState(false);
+  const [highlightedCode, setHighlightedCode] = useState<string>("");
 
   const handleButtonClick = () => {
     navigator.clipboard.writeText(children);
@@ -36,6 +35,29 @@ export const CodeBlock: FC<Props> = memo(({ language, children }) => {
 
     return () => clearTimeout(timeout);
   }, [isIconChecked]);
+
+  useEffect(() => {
+    const highlightCode = async () => {
+      try {
+        const { createHighlighter } = await import('shiki');
+        const highlighter = await createHighlighter({
+          themes: ['vitesse-dark'],
+          langs: [language || 'text', 'javascript', 'typescript', 'json', 'bash', 'python', 'sql']
+        });
+        
+        const html = highlighter.codeToHtml(children, {
+          lang: language || 'text',
+          theme: 'vitesse-dark'
+        });
+        setHighlightedCode(html);
+      } catch (error) {
+        // Fallback to plain text if highlighting fails
+        setHighlightedCode(`<pre><code>${children}</code></pre>`);
+      }
+    };
+
+    highlightCode();
+  }, [children, language]);
 
   return (
     <div className="flex flex-col -mx-9">
@@ -56,9 +78,10 @@ export const CodeBlock: FC<Props> = memo(({ language, children }) => {
         </Button>
       </div>
 
-      <Prism language={language} style={atomDark} PreTag="pre" showLineNumbers>
-        {children}
-      </Prism>
+      <div 
+        className="shiki-container"
+        dangerouslySetInnerHTML={{ __html: highlightedCode || `<pre><code>${children}</code></pre>` }}
+      />
     </div>
   );
 });

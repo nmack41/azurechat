@@ -73,3 +73,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Shiki code block styling */
+.shiki-container pre {
+  @apply rounded-lg p-4 overflow-x-auto;
+  margin: 0;
+}
+
+.shiki-container code {
+  @apply text-sm;
+}
